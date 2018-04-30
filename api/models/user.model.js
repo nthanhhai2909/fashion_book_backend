@@ -1,7 +1,7 @@
 'use strict'
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
-var user = new Schema({
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+const user = new Schema({
     email: {
         type: String,
         required: [true, "can't be blank"],
