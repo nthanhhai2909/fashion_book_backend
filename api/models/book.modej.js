@@ -31,6 +31,22 @@ const book = new Schema({
     NPH: {
         type: String,
         required: [true, "can't be blank"],
+    },
+    view_counts: {
+        type:Number,
+        default: 0, 
+        validate : {
+            validator : Number.isInteger,
+            message   : '{VALUE} is not an integer value'
+          }
+    },
+    sales: {
+        type: Number,
+        default: 0,
+        validate : {
+            validator : Number.isInteger,
+            message   : '{VALUE} is not an integer value'
+        }
     }
 });
 module.exports = mongoose.model('book', book);
