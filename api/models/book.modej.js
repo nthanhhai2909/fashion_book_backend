@@ -16,6 +16,9 @@ const book = new Schema({
         type: String,
         required: [true, "can't be blank"],
     },
+    release_date: {
+        type: Date,
+    },
     img: {
         type: String,
         required: [true, "can't be blank"],
