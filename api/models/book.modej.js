@@ -32,4 +32,5 @@ const book = new Schema({
         type: String,
         required: [true, "can't be blank"],
     }
-})
+});
+module.exports = mongoose.model('book', book);
