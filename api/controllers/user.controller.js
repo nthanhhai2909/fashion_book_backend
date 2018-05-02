@@ -60,3 +60,32 @@ exports.register = async (req, res) => {
     }
     res.status(201).json({ msg: 'success' })
 }
+
+exports.verifyAccount = async (req, res) => {
+    if(typeof req.params.token === 'undefined'){
+        res.status(402).json({msg: "!invalid"});
+        return;
+    }
+    let token = req.params.token;
+    let tokenFind = null;
+    try{
+        tokenFind = await user.findOne({'token': token});
+    }
+    catch(err){
+        res.status(500).json({msg: err});
+        return;
+    }
+    if(tokenFind == null){
+        res.status(404).json({msg: "not found!!!"});
+        return;
+    }
+    try{
+        await user.findByIdAndUpdate(tokenFind._id ,
+            { $set: { is_verify: true }}, { new: true });
+    }
+    catch(err){
+        res.status(500).json({msg: err});
+        return;
+    }
+    res.status(200).json({msg:"success!"});
+}
