@@ -23,7 +23,7 @@ const user = new Schema({
         type: String
     },
     birthday: {
-        type: Date,
+        type: {$dateToString: {format: "%Y-%m-%d %H:%M:%S",date: "$date"}},
         default: new Date()
     },
     phone_number: {
@@ -37,6 +37,9 @@ const user = new Schema({
     is_verify: {
         type: Boolean,
         default: false
+    },
+    token: {
+        type: String
     }
 });
 module.exports = mongoose.model('user', user);
