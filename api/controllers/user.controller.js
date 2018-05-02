@@ -3,6 +3,7 @@ const user = require('../models/user.model');
 const nodemailer = require('../utils/nodemailer');
 const randomstring = require('randomstring');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 exports.register = async (req, res) => {
     if ((typeof req.body.email === 'undefined')
         || (typeof req.body.password === 'undefined')
@@ -88,4 +89,37 @@ exports.verifyAccount = async (req, res) => {
         return;
     }
     res.status(200).json({msg:"success!"});
+}
+
+exports.login = async (req, res) => {
+    if(typeof req.body.email === 'undefined'
+    || typeof req.body.password == 'undefined'){
+        res.json({msg: "Invalid data"});
+        return;
+    }
+    let { email, password } = req.body;
+    let userFind = null;
+    try{
+        userFind = await user.findOne({'email': email});
+    }
+    catch(err){
+        res.json({msg: err});
+        return;
+    }
+    if(userFind == null){
+        res.status(422).json({msg: "Invalid data"});
+        return;
+    }
+
+    if(!userFind.is_verify){
+        res.status(401).json({msg: 'no_registration_confirmation'});
+        return;
+    }
+    
+    if(!bcrypt.compareSync(password, userFind.password)){
+        res.status(422).json({msg: 'Invalid data'});
+        return;
+    }
+    let token = jwt.sign({email: email}, 'shhhhh');
+    res.status(200).json({msg: 'success', token: token});
 }
