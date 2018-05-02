@@ -29,5 +29,10 @@ const user = new Schema({
         type: String,
         required: [true, 'User phone number required']
     },
+    is_admin: {
+        type: Boolean,
+        default: false
+    }
+
 });
 module.exports = mongoose.model('user', user);
