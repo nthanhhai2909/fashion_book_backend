@@ -10,4 +10,12 @@ module.exports = (app) => {
     app.route('/user/login')
     .post(user_controller.login);
 
+    app.route('/user/request/resetpassword/:email')
+    .get(user_controller.requestResetPassword)
+
+    app.route('/user/verify/resetpassword')
+    .post(user_controller.verifyResetPassword)
+
+    app.route('/user/resetpassword')
+    .post(user_controller.resetPassword)
 }

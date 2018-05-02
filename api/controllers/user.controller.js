@@ -4,6 +4,7 @@ const nodemailer = require('../utils/nodemailer');
 const randomstring = require('randomstring');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const otp = require('../utils/otp');
 exports.register = async (req, res) => {
     if ((typeof req.body.email === 'undefined')
         || (typeof req.body.password === 'undefined')
@@ -94,7 +95,7 @@ exports.verifyAccount = async (req, res) => {
 exports.login = async (req, res) => {
     if(typeof req.body.email === 'undefined'
     || typeof req.body.password == 'undefined'){
-        res.json({msg: "Invalid data"});
+        res.status(402).json({msg: "Invalid data"});
         return;
     }
     let { email, password } = req.body;
@@ -122,4 +123,106 @@ exports.login = async (req, res) => {
     }
     let token = jwt.sign({email: email}, 'shhhhh');
     res.status(200).json({msg: 'success', token: token});
+}
+
+exports.requestResetPassword = async (req, res) => {
+    if(typeof req.params.email === 'undefined'){
+        res.json({msg: "Invalid data"});
+        return;
+    }
+    let email = req.params.email;
+    let userFind = null;
+    try{
+        userFind = await user.findOne({'email': email});
+    }
+    catch(err){
+        res.json({msg: err});
+        return;
+    }
+    if(userFind == null) {
+        res.status(422).json({msg: "Invalid data"});
+    }
+    if(!userFind.is_verify){
+        res.status(401).json({msg: 'no_registration_confirmation'});
+        return;
+    }
+    let token = otp.generateOTP();
+    let sendEmail = await nodemailer.sendEmailResetPassword(email, token);
+    if (!sendEmail) {
+        res.status(500).json({ msg: 'Send email fail' });
+        return;
+    }   
+    userFind.token = token;
+    try {
+        await userFind.save();
+    }
+    catch (err) {
+        res.status(500).json({ msg: err });
+        return;
+    }
+    res.status(201).json({ msg: 'success' })
+}
+
+exports.verifyResetPassword = async (req, res) => {
+    if(typeof req.body.email === 'undefined'
+    || typeof req.body.otp === 'undefined'){
+        res.status(402).json({msg: "Invalid data"});
+        return;
+    }
+
+    let { email, otp } = req.body;
+    let userFind = null;
+    try{
+        userFind = await user.findOne({'email': email});
+    }
+    catch(err){
+        res.json({msg: err});
+        return;
+    }
+    if(userFind == null){
+        res.status(422).json({msg: "Invalid data"});
+        return;
+    }
+    if(userFind.token != otp) {
+        res.status(422).json({msg: "OTP fail"});
+        return;
+    }
+    res.status(200).json({msg: "success"});
+}
+
+exports.resetPassword = async (req, res) => {
+    if(typeof req.body.email === 'undefined'
+    || typeof req.body.otp === 'undefined'
+    || typeof req.body.newPassword === 'undefined'){
+        res.status(402).json({msg: "Invalid data"});
+        return;
+    }
+    let { email, otp, newPassword } = req.body;
+    let userFind = null;
+    try{
+        userFind = await user.findOne({'email': email});
+    }
+    catch(err){
+        res.json({msg: err});
+        return;
+    }
+    if(userFind == null){
+        res.status(422).json({msg: "Invalid data"});
+        return;
+    }
+    if(userFind.token != otp) {
+        res.status(422).json({msg: "OTP fail"});
+        return;
+    }
+
+    userFind.password = bcrypt.hashSync(newPassword, 10);
+    try {
+        await userFind.save();
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ msg: err });
+        return;
+    }
+    res.status(201).json({ msg: 'success' })
 }
