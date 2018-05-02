@@ -9,8 +9,8 @@ const bill_detail = new Schema({
         index: true,
     },
     date: {
-        type: String,
-        required: [true, "can't be blank"],
+        type: Date,
+        default: new Date()
     },
     products: {
         type: Array,
