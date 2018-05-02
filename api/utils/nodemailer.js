@@ -23,5 +23,25 @@ exports.sendEmail = async (email, token) => {
         return false;
     }
     return true;
-    
+}
+
+exports.sendEmailResetPassword = async (email, token) => {
+    let mailOptions = {
+        from: '"NTHANHHAI 👻" <nthanhhai2909@gmail.com>', // sender address
+        to: email, // list of receivers
+        subject: 'Account Verification Token', // Subject line
+        html: '<b>Reset password</b>'
+            + ' <br/>'
+            + '<span>Please enter OTP below</span>'
+            + '<br/>'
+            + '<span>' + token +  '</span>'
+    };
+    try{
+        let send = await transporter.sendMail(mailOptions);
+    }
+    catch(err){
+        console.log(err);
+        return false;
+    }
+    return true;
 }
