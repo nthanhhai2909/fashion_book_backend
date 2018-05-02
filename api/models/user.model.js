@@ -32,7 +32,10 @@ const user = new Schema({
     is_admin: {
         type: Boolean,
         default: false
+    },
+    is_verify: {
+        type: Boolean,
+        default: false
     }
-
 });
 module.exports = mongoose.model('user', user);
