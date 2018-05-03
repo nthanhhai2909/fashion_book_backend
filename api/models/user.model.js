@@ -24,7 +24,6 @@ const user = new Schema({
     },
     phone_number: {
         type: String,
-        required: [true, 'User phone number required']
     },
     is_admin: {
         type: Boolean,
