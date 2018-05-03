@@ -22,10 +22,6 @@ const user = new Schema({
     address: {
         type: String
     },
-    birthday: {
-        type: {$dateToString: {format: "%Y-%m-%d %H:%M:%S",date: "$date"}},
-        default: new Date()
-    },
     phone_number: {
         type: String,
         required: [true, 'User phone number required']

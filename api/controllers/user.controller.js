@@ -18,7 +18,7 @@ exports.register = async (req, res) => {
         return;
     }
     let { email, password, firstName, lastName, address, birthday, phone_number} = req.body;
-    if (email.indexOf("@") == -1 
+    if (email.indexOf("@")=== -1 && email.indexOf('.') === -1 
         || password.length < 6 ){
         res.status(422).json({ msg: 'Invalid data' });
         return;
