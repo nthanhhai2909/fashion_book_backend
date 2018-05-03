@@ -11,7 +11,6 @@ exports.register = async (req, res) => {
         || typeof req.body.firstName === 'undefined'
         || typeof req.body.lastName === 'undefined'
         || typeof req.body.address === 'undefined'
-        || typeof req.body.birthday === 'undefined'
         || typeof req.body.phone_number === 'undefined'
     ) {
         res.status(422).json({ msg: 'Invalid data' });
@@ -125,11 +124,11 @@ exports.login = async (req, res) => {
     res.status(200).json({msg: 'success', token: token});
 }
 
-exports.requestResetPassword = async (req, res) => {
+exports.requestForgotPassword = async (req, res) => {
     if(typeof req.params.email === 'undefined'){
         res.json({msg: "Invalid data"});
         return;
-    }
+    }   
     let email = req.params.email;
     let userFind = null;
     try{
@@ -163,7 +162,7 @@ exports.requestResetPassword = async (req, res) => {
     res.status(201).json({ msg: 'success' })
 }
 
-exports.verifyResetPassword = async (req, res) => {
+exports.verifyForgotPassword = async (req, res) => {
     if(typeof req.body.email === 'undefined'
     || typeof req.body.otp === 'undefined'){
         res.status(402).json({msg: "Invalid data"});
@@ -190,7 +189,7 @@ exports.verifyResetPassword = async (req, res) => {
     res.status(200).json({msg: "success"});
 }
 
-exports.resetPassword = async (req, res) => {
+exports.forgotPassword = async (req, res) => {
     if(typeof req.body.email === 'undefined'
     || typeof req.body.otp === 'undefined'
     || typeof req.body.newPassword === 'undefined'){
