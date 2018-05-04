@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const userRouter = require('./api/routers/user.router');
+const categoryRouter = require('./api/routers/categoy.router');
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/fashion_book_db');
 
@@ -15,7 +16,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
 
 userRouter(app);
-
+categoryRouter(app);
 
 app.get('/', (req, res) => {res.send('welcome to fashtion_book')})
 
