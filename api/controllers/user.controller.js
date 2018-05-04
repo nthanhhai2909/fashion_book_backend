@@ -146,7 +146,7 @@ exports.requestForgotPassword = async (req, res) => {
         return;
     }
     let token = otp.generateOTP();
-    let sendEmail = await nodemailer.sendEmailResetPassword(email, token);
+    let sendEmail = await nodemailer.sendEmailForgotPassword(email, token);
     if (!sendEmail) {
         res.status(500).json({ msg: 'Send email fail' });
         return;
@@ -159,7 +159,7 @@ exports.requestForgotPassword = async (req, res) => {
         res.status(500).json({ msg: err });
         return;
     }
-    res.status(201).json({ msg: 'success' })
+    res.status(201).json({ msg: 'success', email: email })
 }
 
 exports.verifyForgotPassword = async (req, res) => {
@@ -186,7 +186,7 @@ exports.verifyForgotPassword = async (req, res) => {
         res.status(422).json({msg: "OTP fail"});
         return;
     }
-    res.status(200).json({msg: "success"});
+    res.status(200).json({msg: "success", otp: otp});
 }
 
 exports.forgotPassword = async (req, res) => {

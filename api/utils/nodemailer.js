@@ -25,12 +25,12 @@ exports.sendEmail = async (email, token) => {
     return true;
 }
 
-exports.sendEmailResetPassword = async (email, token) => {
+exports.sendEmailForgotPassword = async (email, token) => {
     let mailOptions = {
         from: '"NTHANHHAI 👻" <nthanhhai2909@gmail.com>', // sender address
         to: email, // list of receivers
         subject: 'Account Verification Token', // Subject line
-        html: '<b>Reset password</b>'
+        html: '<b>Forgot password</b>'
             + ' <br/>'
             + '<span>Please enter OTP below</span>'
             + '<br/>'
