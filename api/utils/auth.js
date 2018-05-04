@@ -20,5 +20,5 @@ exports.verify = async(req, res) => {
     catch(err){
         res.status(404).json({msg: 'unsuccess'});
     }
-    es.status(404).json({msg: 'unsuccess'});
+    res.status(404).json({msg: 'unsuccess'});
 }
