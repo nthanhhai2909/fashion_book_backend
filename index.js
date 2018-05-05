@@ -8,6 +8,7 @@ const cors = require('cors');
 const userRouter = require('./api/routers/user.router');
 const categoryRouter = require('./api/routers/categoy.router');
 const publisherRouter = require('./api/routers/publisher.router');
+const bookRouter = require('./api/routers/book.router');
 
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/fashion_book_db');
@@ -20,6 +21,7 @@ app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
 userRouter(app);
 categoryRouter(app);
 publisherRouter(app);
+bookRouter(app);
 
 app.get('/', (req, res) => {res.send('welcome to fashtion_book')})
 
