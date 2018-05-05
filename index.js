@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const userRouter = require('./api/routers/user.router');
 const categoryRouter = require('./api/routers/categoy.router');
+
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/fashion_book_db');
 
