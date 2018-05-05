@@ -18,6 +18,7 @@ const book = new Schema({
     },
     release_date: {
         type: Date,
+        $dateToString: { format: "%Y-%m-%d", date: "$date" }
     },
     img: {
         type: String,
@@ -28,10 +29,6 @@ const book = new Schema({
         default: "",
     },
     NSX: {
-        type: String,
-        required: [true, "can't be blank"],
-    },
-    NPH: {
         type: String,
         required: [true, "can't be blank"],
     },
