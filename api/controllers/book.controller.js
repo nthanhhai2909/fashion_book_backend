@@ -31,14 +31,14 @@ exports.getAllBook = async (req, res) => {
 
     let totalPage = await parseInt(((bookCount - 1) / 9) + 1);
 
-    if ((page > totalPage) || (page < 1)) {
-        res.status(409).json({ msg: 'Invalid page' });
+    if ((parseInt(page) > totalPage) || (parseInt(page) < 1)) {
+        res.status(409).json({ msg: 'Invalid page', totalPage });
         return;
     }
 
     book
         .find({})
-        .skip(9 * (page - 1))
+        .skip(9 * (parseInt(page) - 1))
         .limit(9)
         .exec((err, docs) => {
             if (err) {
