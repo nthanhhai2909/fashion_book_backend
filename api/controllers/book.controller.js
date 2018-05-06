@@ -19,10 +19,23 @@ exports.getAllBook = async (req, res) => {
     }
 
     let { page } = req.body;
+    let range = null;
+    var objRange = null;
+
+    if (typeof req.body.range !== 'undefined') {
+        range = req.body.range;
+        objRange = JSON.parse(range);
+    }
 
     let bookCount = null;
     try {
-        bookCount = await book.count({});
+        if (range !== null) {
+            bookCount = await book
+                .count({ price: { $gte: objRange.low, $lte: objRange.high } });
+        }
+        else {
+            bookCount = await book.count({});
+        }
     }
     catch (err) {
         res.status(500).json({ msg: err });
@@ -36,21 +49,37 @@ exports.getAllBook = async (req, res) => {
         return;
     }
 
-    book
-        .find({})
-        .skip(9 * (parseInt(page) - 1))
-        .limit(9)
-        .exec((err, docs) => {
-            if (err) {
-                console.log(err);
-                res.status(500).json({ msg: err });
-                return;
-            }
-            res.status(200).json({ data: docs, totalPage });
-        });
+    if (range !== null) {
+        book
+            .find({ price: { $gte: objRange.low, $lte: objRange.high } })
+            .skip(9 * (parseInt(page) - 1))
+            .limit(9)
+            .exec((err, docs) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).json({ msg: err });
+                    return;
+                }
+                res.status(200).json({ data: docs, totalPage });
+            });
+    }
+    else {
+        book
+            .find({})
+            .skip(9 * (parseInt(page) - 1))
+            .limit(9)
+            .exec((err, docs) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).json({ msg: err });
+                    return;
+                }
+                res.status(200).json({ data: docs, totalPage });
+            });
+    }
 }
 
-exports.getBookByCategory = async(req, res) => {
+exports.getBookByCategory = async (req, res) => {
     if (typeof req.body.category === 'undefined'
         || typeof req.body.page === 'undefined'
     ) {
@@ -62,9 +91,9 @@ exports.getBookByCategory = async(req, res) => {
 
     let bookCount, bookFind
     try {
-        bookFind = await book.find({id_category: category});
+        bookFind = await book.find({ id_category: category });
     }
-    catch(err){
+    catch (err) {
         res.status(500).json({ msg: err });
         return;
     }
@@ -72,7 +101,7 @@ exports.getBookByCategory = async(req, res) => {
     let totalPage = parseInt(((bookCount - 1) / 9) + 1);
 
     if (parseInt(page) < 1 || parseInt(page) > totalPage) {
-        res.status(409).json({ msg: 'Page incorrect.' }); 
+        res.status(409).json({ msg: 'Page incorrect.' });
         return;
     }
 
