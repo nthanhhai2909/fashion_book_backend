@@ -13,7 +13,7 @@ const book = new Schema({
         index: true,
     },
     price: {
-        type: String,
+        type: Number,
         required: [true, "can't be blank"],
     },
     release_date: {
