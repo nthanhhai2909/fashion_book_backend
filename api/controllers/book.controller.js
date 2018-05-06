@@ -107,5 +107,11 @@ exports.getBookByID = async (req, res) => {
         res.status(404).json({msg: "not found"})
         return;
     }
+    result.view_counts = result.view_counts + 1;
+    result.save((err,docs) => {
+        if(err){
+            console.log(err);
+        }
+    });
     res.status(200).json({data: result})
 }
