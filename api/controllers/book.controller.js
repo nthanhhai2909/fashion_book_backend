@@ -99,6 +99,7 @@ exports.getBookByID = async (req, res) => {
         result = await book.findById(req.params.id);
     }
     catch(err) {
+        console.log(err)
         res.status(500).json({msg: err})
         return;
     }

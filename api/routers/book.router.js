@@ -12,5 +12,4 @@ module.exports = (app) => {
 
     app.route('/book/:id')
         .get(book_controller.getBookByID)
-
 }
