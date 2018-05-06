@@ -19,6 +19,7 @@ exports.verify = async(req, res) => {
     }
     catch(err){
         res.status(404).json({msg: 'unsuccess'});
+        return
     }
     res.status(404).json({msg: 'unsuccess'});
 }
