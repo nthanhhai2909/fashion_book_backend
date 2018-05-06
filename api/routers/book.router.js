@@ -9,4 +9,8 @@ module.exports = (app) => {
 
     app.route('/book/category')
         .post(book_controller.getBookByCategory);
+
+    app.route('/book/:id')
+        .get(book_controller.getBookByID)
+
 }

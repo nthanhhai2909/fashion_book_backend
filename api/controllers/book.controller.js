@@ -30,7 +30,6 @@ exports.getAllBook = async (req, res) => {
     }
 
     let totalPage = await parseInt(((bookCount - 1) / 9) + 1);
-
     if ((parseInt(page) > totalPage) || (parseInt(page) < 1)) {
         res.status(409).json({ msg: 'Invalid page', totalPage });
         return;
@@ -47,6 +46,7 @@ exports.getAllBook = async (req, res) => {
                 return;
             }
             res.status(200).json({ data: docs, totalPage });
+            return
         });
 }
 
@@ -87,4 +87,24 @@ exports.getBookByCategory = async(req, res) => {
             }
             res.status(200).json({ data: docs, totalPage: totalPage });
         })
+}
+
+exports.getBookByID = async (req, res) => {
+    if(req.params.id === 'undefined') {
+        res.status(422).json({ msg: 'Invalid data' });
+        return;
+    }
+    let result
+    try {
+        result = await book.findById(req.params.id);
+    }
+    catch(err) {
+        res.status(500).json({msg: err})
+        return;
+    }
+    if(result === null){
+        res.status(404).json({msg: "not found"})
+        return;
+    }
+    res.status(200).json({data: result})
 }

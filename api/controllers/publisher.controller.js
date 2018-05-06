@@ -9,5 +9,6 @@ exports.getAll = (req, res) => {
             return;
         }
         res.status(200).json({data: docs})
+        return
     })
 }
