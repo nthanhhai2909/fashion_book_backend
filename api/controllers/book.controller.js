@@ -19,10 +19,23 @@ exports.getAllBook = async (req, res) => {
     }
 
     let { page } = req.body;
+    let range = null;
+    var objRange = null;
+
+    if (typeof req.body.range !== 'undefined') {
+        range = req.body.range;
+        objRange = JSON.parse(range);
+    }
 
     let bookCount = null;
     try {
-        bookCount = await book.count({});
+        if (range !== null) {
+            bookCount = await book
+                .count({ price: { $gte: objRange.low, $lte: objRange.high } });
+        }
+        else {
+            bookCount = await book.count({});
+        }
     }
     catch (err) {
         res.status(500).json({ msg: err });
@@ -30,24 +43,39 @@ exports.getAllBook = async (req, res) => {
     }
 
     let totalPage = await parseInt(((bookCount - 1) / 9) + 1);
-
     if ((parseInt(page) > totalPage) || (parseInt(page) < 1)) {
         res.status(409).json({ msg: 'Invalid page', totalPage });
         return;
     }
 
-    book
-        .find({})
-        .skip(9 * (parseInt(page) - 1))
-        .limit(9)
-        .exec((err, docs) => {
-            if (err) {
-                console.log(err);
-                res.status(500).json({ msg: err });
-                return;
-            }
-            res.status(200).json({ data: docs, totalPage });
-        });
+    if (range !== null) {
+        book
+            .find({ price: { $gte: objRange.low, $lte: objRange.high } })
+            .skip(9 * (parseInt(page) - 1))
+            .limit(9)
+            .exec((err, docs) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).json({ msg: err });
+                    return;
+                }
+                res.status(200).json({ data: docs, totalPage });
+            });
+    }
+    else {
+        book
+            .find({})
+            .skip(9 * (parseInt(page) - 1))
+            .limit(9)
+            .exec((err, docs) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).json({ msg: err });
+                    return;
+                }
+                res.status(200).json({ data: docs, totalPage });
+            });
+    }
 }
 
 exports.getBookByCategory = async (req, res) => {
@@ -127,5 +155,31 @@ exports.getBookByCategory = async (req, res) => {
                 res.status(200).json({ data: docs, totalPage: totalPage });
             })
     }
+}
 
+exports.getBookByID = async (req, res) => {
+    if(req.params.id === 'undefined') {
+        res.status(422).json({ msg: 'Invalid data' });
+        return;
+    }
+    let result
+    try {
+        result = await book.findById(req.params.id);
+    }
+    catch(err) {
+        console.log(err)
+        res.status(500).json({msg: err})
+        return;
+    }
+    if(result === null){
+        res.status(404).json({msg: "not found"})
+        return;
+    }
+    result.view_counts = result.view_counts + 1;
+    result.save((err,docs) => {
+        if(err){
+            console.log(err);
+        }
+    });
+    res.status(200).json({data: result})
 }
