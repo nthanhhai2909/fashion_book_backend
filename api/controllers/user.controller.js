@@ -121,7 +121,14 @@ exports.login = async (req, res) => {
         return;
     }
     let token = jwt.sign({email: email}, 'shhhhh');
-    res.status(200).json({msg: 'success', token: token});
+    res.status(200).json({msg: 'success', token: token, user: {
+        email: userFind.email,
+        firstName: userFind.firstName,
+        lastName: userFind.lastName,
+        address: userFind.address,
+        phone_number: userFind.phone_number
+
+    }});
 }
 
 exports.requestForgotPassword = async (req, res) => {
