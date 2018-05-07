@@ -86,35 +86,75 @@ exports.getBookByCategory = async (req, res) => {
         return;
     }
 
-    let { category, page, range } = req.body;
+    let { category, page} = req.body;
 
-    let bookCount, bookFind
-    try {
-        bookFind = await book.find({ id_category: category });
-    }
-    catch (err) {
-        res.status(500).json({ msg: err });
-        return;
-    }
-    bookCount = bookFind.length;
-    let totalPage = parseInt(((bookCount - 1) / 9) + 1);
+    let range = null;
+    var objRange = null;
 
-    if (parseInt(page) < 1 || parseInt(page) > totalPage) {
-        res.status(409).json({ msg: 'Page incorrect.' });
-        return;
+    if (typeof req.body.range !== 'undefined') {
+        range = req.body.range;
+        objRange = JSON.parse(range);
     }
 
-    book.find({ id_category: category })
-        .limit(9)
-        .skip(9 * (page - 1))
-        .exec((err, docs) => {
-            if (err) {
-                console.log(err);
-                res.status(500).json({ msg: err });
-                return;
-            }
-            res.status(200).json({ data: docs, totalPage: totalPage });
-        })
+    let bookCount, bookFind;
+
+    if (typeof req.body.range === 'undefined') {
+        try {
+            bookFind = await book.find({ id_category: category });
+        }
+        catch (err) {
+            res.status(500).json({ msg: err });
+            return;
+        }
+
+        bookCount = bookFind.length;
+        let totalPage = parseInt(((bookCount - 1) / 9) + 1);
+
+        if (parseInt(page) < 1 || parseInt(page) > totalPage) {
+            res.status(409).json({ msg: 'Page incorrect.' });
+            return;
+        }
+
+        book.find({ id_category: category })
+            .limit(9)
+            .skip(9 * (page - 1))
+            .exec((err, docs) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).json({ msg: err });
+                    return;
+                }
+                res.status(200).json({ data: docs, totalPage: totalPage });
+            })
+    } else {
+        try {
+            bookFind = await book.find({ id_category: category, price: { $gt: objRange.low, $lt: objRange.high } });
+        }
+        catch (err) {
+            res.status(500).json({ msg: err });
+            return;
+        }
+
+        bookCount = bookFind.length;
+        let totalPage = parseInt(((bookCount - 1) / 9) + 1);
+
+        if (parseInt(page) < 1 || parseInt(page) > totalPage) {
+            res.status(409).json({ msg: 'Page incorrect.' });
+            return;
+        }
+
+        book.find({ id_category: category, price: { $gt: objRange.low, $lt: objRange.high } })
+            .limit(9)
+            .skip(9 * (page - 1))
+            .exec((err, docs) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).json({ msg: err });
+                    return;
+                }
+                res.status(200).json({ data: docs, totalPage: totalPage });
+            })
+    }
 }
 
 exports.getBookByID = async (req, res) => {
