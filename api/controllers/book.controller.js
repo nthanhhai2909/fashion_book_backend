@@ -17,13 +17,23 @@ exports.getAllBook = async (req, res) => {
         res.status(422).json({ msg: 'Invalid data' });
         return;
     }
-    let { page } = req.body;
+    //Khoang gia
     let range = null;
-    var objRange = null;
+    let objRange = null;
     if (typeof req.body.range !== 'undefined') {
         range = req.body.range;
         objRange = JSON.parse(range);
     }
+    //Sap xep
+    let sortType = "view_counts";
+    let sortOrder = "1";
+    if (typeof req.body.sorttype !== 'undefined') {
+        sortType = req.body.sorttype;
+    }
+    if (typeof req.body.sortorder !== 'undefined') {
+        sortOrder = req.body.sortorder;
+    }
+    //Trang va tong so trang
     let bookCount = null;
     try {
         if (range !== null) {
@@ -39,15 +49,21 @@ exports.getAllBook = async (req, res) => {
         return;
     }
     let totalPage = await parseInt(((bookCount - 1) / 9) + 1);
+    let { page } = req.body;
     if ((parseInt(page) > totalPage) || (parseInt(page) < 1)) {
         res.status(409).json({ msg: 'Invalid page', totalPage });
         return;
     }
+    //De sort
+    let sortQuery = {}
+    sortQuery[sortType] = sortOrder;
+    //Lay du lieu
     if (range !== null) {
         book
             .find({ price: { $gte: objRange.low, $lte: objRange.high } })
             .skip(9 * (parseInt(page) - 1))
             .limit(9)
+            .sort(sortQuery)
             .exec((err, docs) => {
                 if (err) {
                     console.log(err);
@@ -62,6 +78,7 @@ exports.getAllBook = async (req, res) => {
             .find({})
             .skip(9 * (parseInt(page) - 1))
             .limit(9)
+            .sort(sortQuery)
             .exec((err, docs) => {
                 if (err) {
                     console.log(err);
@@ -75,17 +92,19 @@ exports.getAllBook = async (req, res) => {
 
 exports.getBookByPublisher = async (req, res) => {
     if ((typeof req.body.page === 'undefined')
-    || (typeof req.body.publisher === 'undefined')) {
+        || (typeof req.body.publisher === 'undefined')) {
         res.status(422).json({ msg: 'Invalid data' });
         return;
     }
     let { publisher, page } = req.body;
+    //Khoang gia
     let range = null;
-    var objRange = null;
+    let objRange = null;
     if (typeof req.body.range !== 'undefined') {
         range = req.body.range;
         objRange = JSON.parse(range);
     }
+    //Trang va tong so trang
     let bookCount = null;
     try {
         if (range !== null) {
@@ -93,7 +112,7 @@ exports.getBookByPublisher = async (req, res) => {
                 .count({ id_nsx: publisher, price: { $gte: objRange.low, $lte: objRange.high } });
         }
         else {
-            bookCount = await book.count({id_nsx: publisher});
+            bookCount = await book.count({ id_nsx: publisher });
         }
     }
     catch (err) {
@@ -105,6 +124,7 @@ exports.getBookByPublisher = async (req, res) => {
         res.status(409).json({ msg: 'Invalid page', totalPage });
         return;
     }
+    //Lay du lieu
     if (range !== null) {
         book
             .find({ id_nsx: publisher, price: { $gte: objRange.low, $lte: objRange.high } })
@@ -121,7 +141,7 @@ exports.getBookByPublisher = async (req, res) => {
     }
     else {
         book
-            .find({id_nsx: publisher})
+            .find({ id_nsx: publisher })
             .skip(9 * (parseInt(page) - 1))
             .limit(9)
             .exec((err, docs) => {
@@ -142,9 +162,9 @@ exports.getBookByCategory = async (req, res) => {
         res.status(422).json({ msg: 'Invalid data' });
         return;
     }
-    let { category, page} = req.body;
+    let { category, page } = req.body;
     let range = null;
-    var objRange = null;
+    let objRange = null;
     if (typeof req.body.range !== 'undefined') {
         range = req.body.range;
         objRange = JSON.parse(range);
@@ -204,7 +224,7 @@ exports.getBookByCategory = async (req, res) => {
 }
 
 exports.getBookByID = async (req, res) => {
-    if(req.params.id === 'undefined') {
+    if (req.params.id === 'undefined') {
         res.status(422).json({ msg: 'Invalid data' });
         return;
     }
@@ -212,20 +232,20 @@ exports.getBookByID = async (req, res) => {
     try {
         result = await book.findById(req.params.id);
     }
-    catch(err) {
+    catch (err) {
         console.log(err)
-        res.status(500).json({msg: err})
+        res.status(500).json({ msg: err })
         return;
     }
-    if(result === null){
-        res.status(404).json({msg: "not found"})
+    if (result === null) {
+        res.status(404).json({ msg: "not found" })
         return;
     }
     result.view_counts = result.view_counts + 1;
-    result.save((err,docs) => {
-        if(err){
+    result.save((err, docs) => {
+        if (err) {
             console.log(err);
         }
     });
-    res.status(200).json({data: result})
+    res.status(200).json({ data: result })
 }
