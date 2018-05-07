@@ -25,7 +25,7 @@ exports.getAllBook = async (req, res) => {
         objRange = JSON.parse(range);
     }
     //Sap xep
-    let sortType = "view_counts";
+    let sortType = "release_date";
     let sortOrder = "1";
     if (typeof req.body.sorttype !== 'undefined') {
         sortType = req.body.sorttype;
@@ -117,7 +117,7 @@ exports.getBookByPublisher = async (req, res) => {
         objRange = JSON.parse(range);
     }
     //Sap xep
-    let sortType = "view_counts";
+    let sortType = "release_date";
     let sortOrder = "1";
     if (typeof req.body.sorttype !== 'undefined') {
         sortType = req.body.sorttype;
