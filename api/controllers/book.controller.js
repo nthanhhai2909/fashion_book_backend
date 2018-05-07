@@ -33,6 +33,18 @@ exports.getAllBook = async (req, res) => {
     if (typeof req.body.sortorder !== 'undefined') {
         sortOrder = req.body.sortorder;
     }
+    if((sortType !== "price")
+    || (sortType !== "release_date")
+    || (sortType !== "view_counts")
+    || (sortType !== "sales")) {
+        res.status(422).json({ msg: 'Invalid sort type' });
+        return;
+    }
+    if((sortOrder !== "1")
+    || (sortOrder !== "-1")) {
+        res.status(422).json({ msg: 'Invalid sort order' });
+        return;
+    }
     //Trang va tong so trang
     let bookCount = null;
     try {
