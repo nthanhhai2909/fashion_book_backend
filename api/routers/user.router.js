@@ -25,4 +25,7 @@ module.exports = (app) => {
 
     app.route('/user/updateinfor')
     .post(user_controller.updateInfor)
+
+    app.route('/user/updatepassword')
+    .post(user_controller.updatePassword)
 }
