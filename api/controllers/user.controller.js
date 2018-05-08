@@ -277,3 +277,39 @@ exports.updateInfor = async (req, res) => {
 
     }});
 }
+
+exports.updatePassword = async (req, res) => {
+    if ( typeof req.body.oldpassword === 'undefined'
+        || typeof req.body.newpassword === 'undefined'
+        || typeof req.body.email === 'undefined'
+    ) {
+        res.status(422).json({ msg: 'Invalid data' });
+        return;
+    }
+    let { email, oldpassword, newpassword } = req.body;
+    let userFind = null;
+    try{
+        userFind = await user.findOne({'email': email});
+    }
+    catch(err){
+        res.json({msg: err});
+        return;
+    }
+    if(userFind == null){
+        res.status(422).json({msg: "Invalid data"});
+        return;
+    }
+    if(!bcrypt.compareSync(oldpassword, userFind.password)){
+        res.status(422).json({msg: 'Invalid data'});
+        return;
+    }
+    userFind.password = bcrypt.hashSync(newpassword, 10);
+    try {
+        await userFind.save()
+    }
+    catch(err) {
+        res.status(500).json({ msg: err });
+        return;
+    }
+    res.status(200).json({msg: 'success'});
+}
