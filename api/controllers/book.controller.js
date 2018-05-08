@@ -229,25 +229,30 @@ exports.getBookByCategory = async (req, res) => {
         res.status(422).json({ msg: 'Invalid sort order' });
         return;
     }
+    //Tinh tong so trang
+    let bookCount, bookFind;
+    try {
+        if (typeof req.body.range === 'undefined') {
+            bookFind = await book.find({ id_category: category });
+        } else {
+            bookFind = await book.find({ id_category: category, price: { $gte: objRange.low, $lte: objRange.high } });
+        }
+    }
+    catch (err) {
+        res.status(500).json({ msg: err });
+        return;
+    }
+    bookCount = bookFind.length;
+    let totalPage = parseInt(((bookCount - 1) / 9) + 1);
+    if (parseInt(page) < 1 || parseInt(page) > totalPage) {
+        res.status(409).json({ msg: 'Page incorrect.' });
+        return;
+    }
     //De sort
     let sortQuery = {}
     sortQuery[sortType] = sortOrder;
     //Lay du lieu
-    let bookCount, bookFind;
     if (typeof req.body.range === 'undefined') {
-        try {
-            bookFind = await book.find({ id_category: category });
-        }
-        catch (err) {
-            res.status(500).json({ msg: err });
-            return;
-        }
-        bookCount = bookFind.length;
-        let totalPage = parseInt(((bookCount - 1) / 9) + 1);
-        if (parseInt(page) < 1 || parseInt(page) > totalPage) {
-            res.status(409).json({ msg: 'Page incorrect.' });
-            return;
-        }
         book.find({ id_category: category })
             .limit(9)
             .skip(9 * (page - 1))
@@ -261,19 +266,6 @@ exports.getBookByCategory = async (req, res) => {
                 res.status(200).json({ data: docs, totalPage: totalPage });
             })
     } else {
-        try {
-            bookFind = await book.find({ id_category: category, price: { $gte: objRange.low, $lte: objRange.high } });
-        }
-        catch (err) {
-            res.status(500).json({ msg: err });
-            return;
-        }
-        bookCount = bookFind.length;
-        let totalPage = parseInt(((bookCount - 1) / 9) + 1);
-        if (parseInt(page) < 1 || parseInt(page) > totalPage) {
-            res.status(409).json({ msg: 'Page incorrect.' });
-            return;
-        }
         book.find({ id_category: category, price: { $gte: objRange.low, $lte: objRange.high } })
             .limit(9)
             .skip(9 * (page - 1))
