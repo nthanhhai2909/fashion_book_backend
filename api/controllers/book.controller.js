@@ -201,12 +201,38 @@ exports.getBookByCategory = async (req, res) => {
         return;
     }
     let { category, page } = req.body;
+    //Khoang gia
     let range = null;
     let objRange = null;
     if (typeof req.body.range !== 'undefined') {
         range = req.body.range;
         objRange = JSON.parse(range);
     }
+    //Sap xep
+    let sortType = "view_counts";
+    let sortOrder = "1";
+    if (typeof req.body.sorttype !== 'undefined') {
+        sortType = req.body.sorttype;
+    }
+    if (typeof req.body.sortorder !== 'undefined') {
+        sortOrder = req.body.sortorder;
+    }
+    if ((sortType !== "price")
+        && (sortType !== "release_date")
+        && (sortType !== "view_counts")
+        && (sortType !== "sales")) {
+        res.status(422).json({ msg: 'Invalid sort type' });
+        return;
+    }
+    if ((sortOrder !== "1")
+        && (sortOrder !== "-1")) {
+        res.status(422).json({ msg: 'Invalid sort order' });
+        return;
+    }
+    //De sort
+    let sortQuery = {}
+    sortQuery[sortType] = sortOrder;
+    //Lay du lieu
     let bookCount, bookFind;
     if (typeof req.body.range === 'undefined') {
         try {
@@ -225,6 +251,7 @@ exports.getBookByCategory = async (req, res) => {
         book.find({ id_category: category })
             .limit(9)
             .skip(9 * (page - 1))
+            .sort(sortQuery)
             .exec((err, docs) => {
                 if (err) {
                     console.log(err);
@@ -235,7 +262,7 @@ exports.getBookByCategory = async (req, res) => {
             })
     } else {
         try {
-            bookFind = await book.find({ id_category: category, price: { $gt: objRange.low, $lt: objRange.high } });
+            bookFind = await book.find({ id_category: category, price: { $gte: objRange.low, $lte: objRange.high } });
         }
         catch (err) {
             res.status(500).json({ msg: err });
@@ -247,9 +274,10 @@ exports.getBookByCategory = async (req, res) => {
             res.status(409).json({ msg: 'Page incorrect.' });
             return;
         }
-        book.find({ id_category: category, price: { $gt: objRange.low, $lt: objRange.high } })
+        book.find({ id_category: category, price: { $gte: objRange.low, $lte: objRange.high } })
             .limit(9)
             .skip(9 * (page - 1))
+            .sort(sortQuery)
             .exec((err, docs) => {
                 if (err) {
                     console.log(err);
