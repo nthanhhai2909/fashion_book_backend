@@ -22,4 +22,7 @@ module.exports = (app) => {
 
     app.route('/auth')
     .post(auth.verify)
+
+    app.route('/user/updateinfor')
+    .post(user_controller.updateInfor)
 }

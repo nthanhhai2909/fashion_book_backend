@@ -232,3 +232,41 @@ exports.forgotPassword = async (req, res) => {
     }
     res.status(201).json({ msg: 'success' })
 }
+
+exports.updateInfor = async (req, res) => {
+
+    if ( typeof req.body.firstName === 'undefined'
+        || typeof req.body.lastName === 'undefined'
+        || typeof req.body.address === 'undefined'
+        || typeof req.body.phone_number === 'undefined'
+        || typeof req.body.email === 'undefined'
+    ) {
+        res.status(422).json({ msg: 'Invalid data' });
+        return;
+    }
+    let { email, firstName, lastName, address, phone_number} = req.body;
+    let userFind
+    try {
+        userFind = await user.findOne({'email': email})
+    }
+    catch(err) {
+        res.status(500).json({ msg: err });
+        return;
+    }
+    if(userFind === null) {
+        res.status(422).json({ msg: "not found" });
+        return;
+    }
+    userFind.firstName = firstName;
+    userFind.lastName = lastName;
+    userFind.address = address;
+    userFind.phone_number = phone_number
+    try {
+        await userFind.save()
+    }
+    catch(err) {
+        res.status(500).json({ msg: err });
+        return;
+    }
+    res.status(201).json({ msg: 'success' });
+}
