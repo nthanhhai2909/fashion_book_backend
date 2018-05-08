@@ -234,7 +234,6 @@ exports.forgotPassword = async (req, res) => {
 }
 
 exports.updateInfor = async (req, res) => {
-
     if ( typeof req.body.firstName === 'undefined'
         || typeof req.body.lastName === 'undefined'
         || typeof req.body.address === 'undefined'
@@ -268,5 +267,13 @@ exports.updateInfor = async (req, res) => {
         res.status(500).json({ msg: err });
         return;
     }
-    res.status(201).json({ msg: 'success' });
+    let token = jwt.sign({email: email}, 'shhhhh');
+    res.status(200).json({msg: 'success', token: token, user: {
+        email: userFind.email,
+        firstName: userFind.firstName,
+        lastName: userFind.lastName,
+        address: userFind.address,
+        phone_number: userFind.phone_number
+
+    }});
 }
