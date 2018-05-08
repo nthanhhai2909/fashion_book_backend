@@ -296,6 +296,18 @@ exports.getBookByAuthor = async (req, res) => {
         range = req.body.range;
         objRange = JSON.parse(range);
     }
+    //Sap xep
+    let sortType = "view_counts";
+    let sortOrder = "1";
+    if (typeof req.body.sorttype !== 'undefined') {
+        sortType = req.body.sorttype;
+    }
+    if (typeof req.body.sortorder !== 'undefined') {
+        sortOrder = req.body.sortorder;
+    }
+    //De sort
+    let sortQuery = {}
+    sortQuery[sortType] = sortOrder;
     //Tinh tong so trang
     let bookCount, bookFind;
     try {
@@ -320,6 +332,7 @@ exports.getBookByAuthor = async (req, res) => {
         book.find({ id_author: author })
             .limit(9)
             .skip(9 * (page - 1))
+            .sort(sortQuery)
             .exec((err, docs) => {
                 if (err) {
                     console.log(err);
@@ -332,6 +345,7 @@ exports.getBookByAuthor = async (req, res) => {
         book.find({ id_author: author, price: { $gte: objRange.low, $lte: objRange.high } })
             .limit(9)
             .skip(9 * (page - 1))
+            .sort(sortQuery)
             .exec((err, docs) => {
                 if (err) {
                     console.log(err);
