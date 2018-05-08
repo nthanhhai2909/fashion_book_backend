@@ -125,15 +125,15 @@ exports.getBookByPublisher = async (req, res) => {
     if (typeof req.body.sortorder !== 'undefined') {
         sortOrder = req.body.sortorder;
     }
-    if((sortType !== "price")
-    && (sortType !== "release_date")
-    && (sortType !== "view_counts")
-    && (sortType !== "sales")) {
+    if ((sortType !== "price")
+        && (sortType !== "release_date")
+        && (sortType !== "view_counts")
+        && (sortType !== "sales")) {
         res.status(422).json({ msg: 'Invalid sort type' });
         return;
     }
-    if((sortOrder !== "1")
-    && (sortOrder !== "-1")) {
+    if ((sortOrder !== "1")
+        && (sortOrder !== "-1")) {
         res.status(422).json({ msg: 'Invalid sort order' });
         return;
     }
@@ -297,9 +297,21 @@ exports.getBookByAuthor = async (req, res) => {
         return;
     }
     let { author, page } = req.body;
+    //Khoang gia
+    let range = null;
+    let objRange = null;
+    if (typeof req.body.range !== 'undefined') {
+        range = req.body.range;
+        objRange = JSON.parse(range);
+    }
+    //Tinh tong so trang
     let bookCount, bookFind;
     try {
-        bookFind = await book.find({ id_author: author });
+        if (typeof req.body.range === 'undefined') {
+            bookFind = await book.find({ id_author: author });
+        } else {
+            bookFind = await book.find({ id_author: author, price: { $gte: objRange.low, $lte: objRange.high } });
+        }
     }
     catch (err) {
         res.status(500).json({ msg: err });
@@ -311,17 +323,32 @@ exports.getBookByAuthor = async (req, res) => {
         res.status(409).json({ msg: 'Page incorrect.' });
         return;
     }
-    book.find({ id_author: author })
-        .limit(9)
-        .skip(9 * (page - 1))
-        .exec((err, docs) => {
-            if (err) {
-                console.log(err);
-                res.status(500).json({ msg: err });
-                return;
-            }
-            res.status(200).json({ data: docs, totalPage: totalPage });
-        })
+    //Lay du lieu
+    if (typeof req.body.range === 'undefined') {
+        book.find({ id_author: author })
+            .limit(9)
+            .skip(9 * (page - 1))
+            .exec((err, docs) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).json({ msg: err });
+                    return;
+                }
+                res.status(200).json({ data: docs, totalPage: totalPage });
+            })
+    } else {
+        book.find({ id_author: author, price: { $gte: objRange.low, $lte: objRange.high } })
+            .limit(9)
+            .skip(9 * (page - 1))
+            .exec((err, docs) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).json({ msg: err });
+                    return;
+                }
+                res.status(200).json({ data: docs, totalPage: totalPage });
+            });
+    }
 }
 
 exports.getBookByID = async (req, res) => {
