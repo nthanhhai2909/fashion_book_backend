@@ -207,11 +207,11 @@ exports.getBookByPublisher = async (req, res) => {
             //SearchText + Range
             if (range !== null) {
                 bookCount = await book
-                    .count({ id_nsx: publisher, name: new RegExp(searchText), price: { $gte: objRange.low, $lte: objRange.high } });
+                    .count({ id_nsx: publisher, name: new RegExp(searchText, "i"), price: { $gte: objRange.low, $lte: objRange.high } });
             }
             //SearchText
             else {
-                bookCount = await book.count({ id_nsx: publisher, name: new RegExp(searchText) });
+                bookCount = await book.count({ id_nsx: publisher, name: new RegExp(searchText, "i") });
             }
         }
         else {
@@ -243,7 +243,7 @@ exports.getBookByPublisher = async (req, res) => {
         //SearchText + Range
         if (range !== null) {
             book
-                .find({ id_nsx: publisher, name: new RegExp(searchText), price: { $gte: objRange.low, $lte: objRange.high } })
+                .find({ id_nsx: publisher, name: new RegExp(searchText, "i"), price: { $gte: objRange.low, $lte: objRange.high } })
                 .skip(9 * (parseInt(page) - 1))
                 .limit(9)
                 .sort(sortQuery)
@@ -259,7 +259,7 @@ exports.getBookByPublisher = async (req, res) => {
         //SearchText
         else {
             book
-                .find({ id_nsx: publisher, name: new RegExp(searchText) })
+                .find({ id_nsx: publisher, name: new RegExp(searchText, "i") })
                 .skip(9 * (parseInt(page) - 1))
                 .limit(9)
                 .sort(sortQuery)
