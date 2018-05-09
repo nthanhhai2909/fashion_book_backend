@@ -26,7 +26,7 @@ exports.getAllBook = async (req, res) => {
     }
     //Sap xep
     let sortType = "release_date";
-    let sortOrder = "1";
+    let sortOrder = "-1";
     if (typeof req.body.sorttype !== 'undefined') {
         sortType = req.body.sorttype;
     }
@@ -118,7 +118,7 @@ exports.getBookByPublisher = async (req, res) => {
     }
     //Sap xep
     let sortType = "release_date";
-    let sortOrder = "1";
+    let sortOrder = "-1";
     if (typeof req.body.sorttype !== 'undefined') {
         sortType = req.body.sorttype;
     }
