@@ -60,7 +60,7 @@ exports.getAllBook = async (req, res) => {
         res.status(500).json({ msg: err });
         return;
     }
-    let totalPage = await parseInt(((bookCount - 1) / 9) + 1);
+    let totalPage = parseInt(((bookCount - 1) / 9) + 1);
     let { page } = req.body;
     if ((parseInt(page) > totalPage) || (parseInt(page) < 1)) {
         res.status(409).json({ msg: 'Invalid page', totalPage });
@@ -152,7 +152,7 @@ exports.getBookByPublisher = async (req, res) => {
         res.status(500).json({ msg: err });
         return;
     }
-    let totalPage = await parseInt(((bookCount - 1) / 9) + 1);
+    let totalPage = parseInt(((bookCount - 1) / 9) + 1);
     if ((parseInt(page) > totalPage) || (parseInt(page) < 1)) {
         res.status(409).json({ msg: 'Invalid page', totalPage });
         return;
