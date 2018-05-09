@@ -210,7 +210,7 @@ exports.getBookByCategory = async (req, res) => {
     }
     //Sap xep
     let sortType = "view_counts";
-    let sortOrder = "1";
+    let sortOrder = "-1";
     if (typeof req.body.sorttype !== 'undefined') {
         sortType = req.body.sorttype;
     }
@@ -298,7 +298,7 @@ exports.getBookByAuthor = async (req, res) => {
     }
     //Sap xep
     let sortType = "view_counts";
-    let sortOrder = "1";
+    let sortOrder = "-1";
     if (typeof req.body.sorttype !== 'undefined') {
         sortType = req.body.sorttype;
     }
