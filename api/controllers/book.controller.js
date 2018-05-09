@@ -57,11 +57,11 @@ exports.getAllBook = async (req, res) => {
             //SearchText + Range
             if (range !== null) {
                 bookCount = await book
-                    .count({ name: new RegExp(searchText), price: { $gte: objRange.low, $lte: objRange.high } });
+                    .count({ name: new RegExp(searchText, "i"), price: { $gte: objRange.low, $lte: objRange.high } });
             }
             //SearchText
             else {
-                bookCount = await book.count({ name: new RegExp(searchText) });
+                bookCount = await book.count({ name: new RegExp(searchText, "i") });
             }
         }
         else {
@@ -94,7 +94,7 @@ exports.getAllBook = async (req, res) => {
         //SearchText + Range
         if (range !== null) {
             book
-                .find({ name: new RegExp(searchText), price: { $gte: objRange.low, $lte: objRange.high } })
+                .find({ name: new RegExp(searchText, "i"), price: { $gte: objRange.low, $lte: objRange.high } })
                 .skip(9 * (parseInt(page) - 1))
                 .limit(9)
                 .sort(sortQuery)
@@ -110,7 +110,7 @@ exports.getAllBook = async (req, res) => {
         //SearchText
         else {
             book
-                .find({ name: new RegExp(searchText) })
+                .find({ name: new RegExp(searchText, "i") })
                 .skip(9 * (parseInt(page) - 1))
                 .limit(9)
                 .sort(sortQuery)
