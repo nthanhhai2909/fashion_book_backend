@@ -127,7 +127,8 @@ exports.getBookByPublisher = async (req, res) => {
     let objRange = null;
     if (typeof req.body.range !== 'undefined') {
         range = req.body.range;
-        objRange = JSON.parse(range);
+        //objRange = JSON.parse(range);
+        objRange = range;
     }
     //Search Text
     let searchText = "";
