@@ -1,5 +1,6 @@
 'use strict'
 const book = require('../models/book.model');
+const publisherController = require('../controllers/publisher.controller');
 
 exports.getTotalPage = (req, res) => {
     book.find({}, (err, docs) => {
@@ -30,6 +31,9 @@ exports.getAllBook = async (req, res) => {
     if (typeof req.body.searchtext !== 'undefined') {
         searchText = req.body.searchtext;
     }
+    let searchPublisher = null;
+    searchPublisher = await publisherController.getIDBySearchText(searchText);
+    console.log(searchPublisher);
     //Sap xep
     let sortType = "release_date";
     let sortOrder = "-1";
@@ -56,10 +60,10 @@ exports.getAllBook = async (req, res) => {
     try {
         if (range !== null) {
             bookCount = await book
-                .count({ name: new RegExp(searchText, "i"), price: { $gte: objRange.low, $lte: objRange.high } });
+                .count({ $or: [{name: new RegExp(searchText, "i")}, {id_nsx: {$in: searchPublisher}}], price: { $gte: objRange.low, $lte: objRange.high } });
         }
         else {
-            bookCount = await book.count({ name: new RegExp(searchText, "i") });
+            bookCount = await book.count({ $or: [{name: new RegExp(searchText, "i")}, {id_nsx: {$in: searchPublisher}}] });
         }
     }
     catch (err) {
@@ -78,7 +82,7 @@ exports.getAllBook = async (req, res) => {
     //Lay du lieu
     if (range !== null) {
         book
-            .find({ name: new RegExp(searchText, "i"), price: { $gte: objRange.low, $lte: objRange.high } })
+            .find({ $or: [{name: new RegExp(searchText, "i")}, {id_nsx: {$in: searchPublisher}}], price: { $gte: objRange.low, $lte: objRange.high } })
             .skip(9 * (parseInt(page) - 1))
             .limit(9)
             .sort(sortQuery)
@@ -93,7 +97,7 @@ exports.getAllBook = async (req, res) => {
     }
     else {
         book
-            .find({ name: new RegExp(searchText, "i") })
+            .find({ $or: [{name: new RegExp(searchText, "i")}, {id_nsx: {$in: searchPublisher}}] })
             .skip(9 * (parseInt(page) - 1))
             .limit(9)
             .sort(sortQuery)
