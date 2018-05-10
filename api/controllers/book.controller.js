@@ -91,7 +91,6 @@ exports.getAllBook = async (req, res) => {
                 res.status(200).json({ data: docs, totalPage });
             });
     }
-    //SearchText
     else {
         book
             .find({ name: new RegExp(searchText, "i") })
