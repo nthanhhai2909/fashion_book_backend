@@ -22,7 +22,7 @@ exports.getAllBook = async (req, res) => {
     let objRange = null;
     if (typeof req.body.range !== 'undefined') {
         range = req.body.range;
-        objRange = JSON.parse(range);
+        objRange = range;
     }
     //Sap xep
     let sortType = "release_date";
