@@ -272,12 +272,8 @@ exports.getBookByCategory = async (req, res) => {
     }
     bookCount = bookFind.length;
     let totalPage = parseInt(((bookCount - 1) / 9) + 1);
-    if (parseInt(page) < 1) {
-        res.status(409).json({ msg: 'Page incorrect.', totalPage: totalPage });
-        return;
-    }
-    if (parseInt(page) > totalPage) {
-        res.status(200).json({ data: null, totalPage: totalPage });
+    if (parseInt(page) < 1 || parseInt(page) > totalPage) {
+        res.status(200).json({ data: [], msg: 'Invalid page', totalPage: totalPage });
         return;
     }
     //De sort
