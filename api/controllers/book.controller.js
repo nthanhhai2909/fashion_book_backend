@@ -1,5 +1,6 @@
 'use strict'
 const book = require('../models/book.model');
+const publisherController = require('../controllers/publisher.controller');
 
 exports.getTotalPage = (req, res) => {
     book.find({}, (err, docs) => {
@@ -22,13 +23,16 @@ exports.getAllBook = async (req, res) => {
     let objRange = null;
     if (typeof req.body.range !== 'undefined') {
         range = req.body.range;
+        //objRange = JSON.parse(range);
         objRange = range;
     }
     //Search Text
-    let searchText = null;
+    let searchText = "";
     if (typeof req.body.searchtext !== 'undefined') {
         searchText = req.body.searchtext;
     }
+    let searchPublisher = null;
+    searchPublisher = await publisherController.getIDBySearchText(searchText);
     //Sap xep
     let sortType = "release_date";
     let sortOrder = "-1";
@@ -53,27 +57,12 @@ exports.getAllBook = async (req, res) => {
     //Trang va tong so trang
     let bookCount = null;
     try {
-        if (searchText !== null) {
-            //SearchText + Range
-            if (range !== null) {
-                bookCount = await book
-                    .count({ name: new RegExp(searchText, "i"), price: { $gte: objRange.low, $lte: objRange.high } });
-            }
-            //SearchText
-            else {
-                bookCount = await book.count({ name: new RegExp(searchText, "i") });
-            }
+        if (range !== null) {
+            bookCount = await book
+                .count({ $or: [{ name: new RegExp(searchText, "i") }, { id_nsx: { $in: searchPublisher } }], price: { $gte: objRange.low, $lte: objRange.high } });
         }
         else {
-            //Range
-            if (range !== null) {
-                bookCount = await book
-                    .count({ price: { $gte: objRange.low, $lte: objRange.high } });
-            }
-            //Nothing
-            else {
-                bookCount = await book.count({});
-            }
+            bookCount = await book.count({ $or: [{ name: new RegExp(searchText, "i") }, { id_nsx: { $in: searchPublisher } }] });
         }
     }
     catch (err) {
@@ -82,81 +71,47 @@ exports.getAllBook = async (req, res) => {
     }
     let totalPage = parseInt(((bookCount - 1) / 9) + 1);
     let { page } = req.body;
-    if ((parseInt(page) > totalPage) || (parseInt(page) < 1)) {
+    if (parseInt(page) < 1) {
         res.status(409).json({ msg: 'Invalid page', totalPage });
+        return;
+    }
+    if (parseInt(page) > totalPage) {
+        res.status(200).json({ data: null, totalPage });
         return;
     }
     //De sort
     let sortQuery = {}
     sortQuery[sortType] = sortOrder;
     //Lay du lieu
-    if (searchText !== null) {
-        //SearchText + Range
-        if (range !== null) {
-            book
-                .find({ name: new RegExp(searchText, "i"), price: { $gte: objRange.low, $lte: objRange.high } })
-                .skip(9 * (parseInt(page) - 1))
-                .limit(9)
-                .sort(sortQuery)
-                .exec((err, docs) => {
-                    if (err) {
-                        console.log(err);
-                        res.status(500).json({ msg: err });
-                        return;
-                    }
-                    res.status(200).json({ data: docs, totalPage });
-                });
-        }
-        //SearchText
-        else {
-            book
-                .find({ name: new RegExp(searchText, "i") })
-                .skip(9 * (parseInt(page) - 1))
-                .limit(9)
-                .sort(sortQuery)
-                .exec((err, docs) => {
-                    if (err) {
-                        console.log(err);
-                        res.status(500).json({ msg: err });
-                        return;
-                    }
-                    res.status(200).json({ data: docs, totalPage });
-                });
-        }
+    if (range !== null) {
+        book
+            .find({ $or: [{ name: new RegExp(searchText, "i") }, { id_nsx: { $in: searchPublisher } }], price: { $gte: objRange.low, $lte: objRange.high } })
+            .skip(9 * (parseInt(page) - 1))
+            .limit(9)
+            .sort(sortQuery)
+            .exec((err, docs) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).json({ msg: err });
+                    return;
+                }
+                res.status(200).json({ data: docs, totalPage });
+            });
     }
     else {
-        //Range
-        if (range !== null) {
-            book
-                .find({ price: { $gte: objRange.low, $lte: objRange.high } })
-                .skip(9 * (parseInt(page) - 1))
-                .limit(9)
-                .sort(sortQuery)
-                .exec((err, docs) => {
-                    if (err) {
-                        console.log(err);
-                        res.status(500).json({ msg: err });
-                        return;
-                    }
-                    res.status(200).json({ data: docs, totalPage });
-                });
-        }
-        //Nothing
-        else {
-            book
-                .find({})
-                .skip(9 * (parseInt(page) - 1))
-                .limit(9)
-                .sort(sortQuery)
-                .exec((err, docs) => {
-                    if (err) {
-                        console.log(err);
-                        res.status(500).json({ msg: err });
-                        return;
-                    }
-                    res.status(200).json({ data: docs, totalPage });
-                });
-        }
+        book
+            .find({ $or: [{ name: new RegExp(searchText, "i") }, { id_nsx: { $in: searchPublisher } }] })
+            .skip(9 * (parseInt(page) - 1))
+            .limit(9)
+            .sort(sortQuery)
+            .exec((err, docs) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).json({ msg: err });
+                    return;
+                }
+                res.status(200).json({ data: docs, totalPage });
+            });
     }
 }
 
@@ -172,10 +127,11 @@ exports.getBookByPublisher = async (req, res) => {
     let objRange = null;
     if (typeof req.body.range !== 'undefined') {
         range = req.body.range;
-        objRange = JSON.parse(range);
+        //objRange = JSON.parse(range);
+        objRange = range;
     }
     //Search Text
-    let searchText = null;
+    let searchText = "";
     if (typeof req.body.searchtext !== 'undefined') {
         searchText = req.body.searchtext;
     }
@@ -203,27 +159,12 @@ exports.getBookByPublisher = async (req, res) => {
     //Trang va tong so trang
     let bookCount = null;
     try {
-        if (searchText !== null) {
-            //SearchText + Range
-            if (range !== null) {
-                bookCount = await book
-                    .count({ id_nsx: publisher, name: new RegExp(searchText, "i"), price: { $gte: objRange.low, $lte: objRange.high } });
-            }
-            //SearchText
-            else {
-                bookCount = await book.count({ id_nsx: publisher, name: new RegExp(searchText, "i") });
-            }
+        if (range !== null) {
+            bookCount = await book
+                .count({ name: new RegExp(searchText, "i"), id_nsx: publisher, price: { $gte: objRange.low, $lte: objRange.high } });
         }
         else {
-            //Range
-            if (range !== null) {
-                bookCount = await book
-                    .count({ id_nsx: publisher, price: { $gte: objRange.low, $lte: objRange.high } });
-            }
-            //Nothing
-            else {
-                bookCount = await book.count({ id_nsx: publisher });
-            }
+            bookCount = await book.count({ name: new RegExp(searchText, "i"), id_nsx: publisher });
         }
     }
     catch (err) {
@@ -231,81 +172,47 @@ exports.getBookByPublisher = async (req, res) => {
         return;
     }
     let totalPage = parseInt(((bookCount - 1) / 9) + 1);
-    if ((parseInt(page) > totalPage) || (parseInt(page) < 1)) {
+    if (parseInt(page) < 1) {
         res.status(409).json({ msg: 'Invalid page', totalPage });
+        return;
+    }
+    if (parseInt(page) > totalPage) {
+        res.status(200).json({ data: null, totalPage });
         return;
     }
     //De sort
     let sortQuery = {}
     sortQuery[sortType] = sortOrder;
     //Lay du lieu
-    if (searchText !== null) {
-        //SearchText + Range
-        if (range !== null) {
-            book
-                .find({ id_nsx: publisher, name: new RegExp(searchText, "i"), price: { $gte: objRange.low, $lte: objRange.high } })
-                .skip(9 * (parseInt(page) - 1))
-                .limit(9)
-                .sort(sortQuery)
-                .exec((err, docs) => {
-                    if (err) {
-                        console.log(err);
-                        res.status(500).json({ msg: err });
-                        return;
-                    }
-                    res.status(200).json({ data: docs, totalPage });
-                });
-        }
-        //SearchText
-        else {
-            book
-                .find({ id_nsx: publisher, name: new RegExp(searchText, "i") })
-                .skip(9 * (parseInt(page) - 1))
-                .limit(9)
-                .sort(sortQuery)
-                .exec((err, docs) => {
-                    if (err) {
-                        console.log(err);
-                        res.status(500).json({ msg: err });
-                        return;
-                    }
-                    res.status(200).json({ data: docs, totalPage });
-                });
-        }
+    if (range !== null) {
+        book
+            .find({ name: new RegExp(searchText, "i"), id_nsx: publisher, price: { $gte: objRange.low, $lte: objRange.high } })
+            .skip(9 * (parseInt(page) - 1))
+            .limit(9)
+            .sort(sortQuery)
+            .exec((err, docs) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).json({ msg: err });
+                    return;
+                }
+                res.status(200).json({ data: docs, totalPage });
+            });
     }
     else {
-        //Range
-        if (range !== null) {
-            book
-                .find({ id_nsx: publisher, price: { $gte: objRange.low, $lte: objRange.high } })
-                .skip(9 * (parseInt(page) - 1))
-                .limit(9)
-                .sort(sortQuery)
-                .exec((err, docs) => {
-                    if (err) {
-                        console.log(err);
-                        res.status(500).json({ msg: err });
-                        return;
-                    }
-                    res.status(200).json({ data: docs, totalPage });
-                });
-        }
-        //Nothing
-        else {
-            book
-                .find({ id_nsx: publisher })
-                .skip(9 * (parseInt(page) - 1))
-                .limit(9)
-                .sort(sortQuery)
-                .exec((err, docs) => {
-                    if (err) {
-                        console.log(err);
-                        res.status(500).json({ msg: err });
-                        return;
-                    }
-                    res.status(200).json({ data: docs, totalPage });
-                });
-        }
+        book
+            .find({ name: new RegExp(searchText, "i"), id_nsx: publisher })
+            .skip(9 * (parseInt(page) - 1))
+            .limit(9)
+            .sort(sortQuery)
+            .exec((err, docs) => {
+                if (err) {
+                    console.log(err);
+                    res.status(500).json({ msg: err });
+                    return;
+                }
+                res.status(200).json({ data: docs, totalPage });
+            });
     }
 }
 

@@ -33,3 +33,16 @@ exports.getNameByID = async (req, res) => {
     }
     res.status(200).json({name: result.name})
 }
+
+exports.getIDBySearchText = async (searchText) => {
+    let arr = [];
+    try {
+        arr = await publisher
+            .find({name: new RegExp(searchText, "i")},{name: 0})
+    }
+    catch (err) {
+        res.status(500).json({ msg: err });
+        return;
+    }
+    return arr.map(i => i.id);
+}
