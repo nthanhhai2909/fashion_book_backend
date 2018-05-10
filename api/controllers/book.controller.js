@@ -186,8 +186,12 @@ exports.getBookByPublisher = async (req, res) => {
         return;
     }
     let totalPage = parseInt(((bookCount - 1) / 9) + 1);
-    if ((parseInt(page) > totalPage) || (parseInt(page) < 1)) {
+    if (parseInt(page) < 1) {
         res.status(409).json({ msg: 'Invalid page', totalPage });
+        return;
+    }
+    if(parseInt(page) > totalPage) {
+        res.status(200).json({ data: null, totalPage });
         return;
     }
     //De sort
