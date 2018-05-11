@@ -18,4 +18,7 @@ module.exports = (app) => {
 
     app.route('/book/:id')
         .get(book_controller.getBookByID)
+
+    app.route('/book/related')
+        .post(book_controller.getRelatedBook)
 }
