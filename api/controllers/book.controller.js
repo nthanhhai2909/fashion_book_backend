@@ -113,11 +113,11 @@ exports.getAllBook = async (req, res) => {
 
 exports.getBookByPublisher = async (req, res) => {
     if ((typeof req.body.page === 'undefined')
-        || (typeof req.body.publisher === 'undefined')) {
+        || (typeof req.body.id === 'undefined')) {
         res.status(422).json({ msg: 'Invalid data' });
         return;
     }
-    let { publisher, page } = req.body;
+    let { id, page } = req.body;
     //Khoang gia
     let range = null;
     let objRange = null;
@@ -157,10 +157,10 @@ exports.getBookByPublisher = async (req, res) => {
     try {
         if (range !== null) {
             bookCount = await book
-                .count({ name: new RegExp(searchText, "i"), id_nsx: publisher, price: { $gte: objRange.low, $lte: objRange.high } });
+                .count({ name: new RegExp(searchText, "i"), id_nsx: id, price: { $gte: objRange.low, $lte: objRange.high } });
         }
         else {
-            bookCount = await book.count({ name: new RegExp(searchText, "i"), id_nsx: publisher });
+            bookCount = await book.count({ name: new RegExp(searchText, "i"), id_nsx: id });
         }
     }
     catch (err) {
@@ -178,7 +178,7 @@ exports.getBookByPublisher = async (req, res) => {
     //Lay du lieu
     if (range !== null) {
         book
-            .find({ name: new RegExp(searchText, "i"), id_nsx: publisher, price: { $gte: objRange.low, $lte: objRange.high } })
+            .find({ name: new RegExp(searchText, "i"), id_nsx: id, price: { $gte: objRange.low, $lte: objRange.high } })
             .skip(9 * (parseInt(page) - 1))
             .limit(9)
             .sort(sortQuery)
@@ -193,7 +193,7 @@ exports.getBookByPublisher = async (req, res) => {
     }
     else {
         book
-            .find({ name: new RegExp(searchText, "i"), id_nsx: publisher })
+            .find({ name: new RegExp(searchText, "i"), id_nsx: id })
             .skip(9 * (parseInt(page) - 1))
             .limit(9)
             .sort(sortQuery)
@@ -209,13 +209,13 @@ exports.getBookByPublisher = async (req, res) => {
 }
 
 exports.getBookByCategory = async (req, res) => {
-    if (typeof req.body.category === 'undefined'
+    if (typeof req.body.id === 'undefined'
         || typeof req.body.page === 'undefined'
     ) {
         res.status(422).json({ msg: 'Invalid data' });
         return;
     }
-    let { category, page } = req.body;
+    let { id, page } = req.body;
     //Khoang gia
     let range = null;
     let objRange = null;
@@ -253,9 +253,9 @@ exports.getBookByCategory = async (req, res) => {
     let bookCount, bookFind;
     try {
         if (range === null) {
-            bookFind = await book.find({ id_category: category, name: new RegExp(searchText, "i") });
+            bookFind = await book.find({ id_category: id, name: new RegExp(searchText, "i") });
         } else {
-            bookFind = await book.find({ id_category: category, name: new RegExp(searchText, "i"), price: { $gte: objRange.low, $lte: objRange.high } });
+            bookFind = await book.find({ id_category: id, name: new RegExp(searchText, "i"), price: { $gte: objRange.low, $lte: objRange.high } });
         }
     }
     catch (err) {
@@ -273,7 +273,7 @@ exports.getBookByCategory = async (req, res) => {
     sortQuery[sortType] = sortOrder;
     //Lay du lieu
     if (range === null) {
-        book.find({ id_category: category, name: new RegExp(searchText, "i") })
+        book.find({ id_category: id, name: new RegExp(searchText, "i") })
             .limit(9)
             .skip(9 * (page - 1))
             .sort(sortQuery)
@@ -286,7 +286,7 @@ exports.getBookByCategory = async (req, res) => {
                 res.status(200).json({ data: docs, totalPage: totalPage });
             })
     } else {
-        book.find({ id_category: category, name: new RegExp(searchText, "i"), price: { $gte: objRange.low, $lte: objRange.high } })
+        book.find({ id_category: id, name: new RegExp(searchText, "i"), price: { $gte: objRange.low, $lte: objRange.high } })
             .limit(9)
             .skip(9 * (page - 1))
             .sort(sortQuery)
@@ -302,13 +302,13 @@ exports.getBookByCategory = async (req, res) => {
 }
 
 exports.getBookByAuthor = async (req, res) => {
-    if (typeof req.body.author === 'undefined'
+    if (typeof req.body.id === 'undefined'
         || typeof req.body.page === 'undefined'
     ) {
         res.status(422).json({ msg: 'Invalid data' });
         return;
     }
-    let { author, page } = req.body;
+    let { id, page } = req.body;
     //Khoang gia
     let range = null;
     let objRange = null;
@@ -349,9 +349,9 @@ exports.getBookByAuthor = async (req, res) => {
     let bookCount, bookFind;
     try {
         if (range === null) {
-            bookFind = await book.find({ id_author: author, name: new RegExp(searchText, "i") });
+            bookFind = await book.find({ id_author: id, name: new RegExp(searchText, "i") });
         } else {
-            bookFind = await book.find({ id_author: author, name: new RegExp(searchText, "i"), price: { $gte: objRange.low, $lte: objRange.high } });
+            bookFind = await book.find({ id_author: id, name: new RegExp(searchText, "i"), price: { $gte: objRange.low, $lte: objRange.high } });
         }
     }
     catch (err) {
@@ -366,7 +366,7 @@ exports.getBookByAuthor = async (req, res) => {
     }
     //Lay du lieu
     if (typeof req.body.range === 'undefined') {
-        book.find({ id_author: author, name: new RegExp(searchText, "i") })
+        book.find({ id_author: id, name: new RegExp(searchText, "i") })
             .limit(9)
             .skip(9 * (page - 1))
             .sort(sortQuery)
@@ -379,7 +379,7 @@ exports.getBookByAuthor = async (req, res) => {
                 res.status(200).json({ data: docs, totalPage: totalPage });
             })
     } else {
-        book.find({ id_author: author, name: new RegExp(searchText, "i"), price: { $gte: objRange.low, $lte: objRange.high } })
+        book.find({ id_author: id, name: new RegExp(searchText, "i"), price: { $gte: objRange.low, $lte: objRange.high } })
             .limit(9)
             .skip(9 * (page - 1))
             .sort(sortQuery)
