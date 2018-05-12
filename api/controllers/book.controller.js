@@ -420,3 +420,36 @@ exports.getBookByID = async (req, res) => {
     });
     res.status(200).json({ data: result })
 }
+
+exports.getRelatedBook = async (req, res) => {
+    if (typeof req.body.bookId === 'undefined') {
+        res.status(422).json({ msg: 'Invalid data' });
+        return;
+    }
+    let { bookId } = req.body;
+    let bookObj = null;
+    try {
+        bookObj = await book.findById(bookId);
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).json({ msg: err })
+        return;
+    }
+    if (bookObj === null) {
+        res.status(200).json({ data: [], msg: 'Invalid bookId' });
+        return;
+    }
+    book
+        .find({ $or: [{ $and: [{ id_category: bookObj.id_category }, { _id: { $nin: [bookId] } }] }, { $and: [{ id_author: bookObj.id_author }, { _id: { $nin: [bookId] } }] }] })
+        .limit(5)
+        .sort({ release_date: -1 })
+        .exec((err, docs) => {
+            if (err) {
+                console.log(err);
+                res.status(500).json({ msg: err });
+                return;
+            }
+            res.status(200).json({ data: docs });
+        });
+}
