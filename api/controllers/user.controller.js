@@ -120,7 +120,7 @@ exports.login = async (req, res) => {
         res.status(422).json({msg: 'Invalid data'});
         return;
     }
-    let token = jwt.sign({email: email}, 'shhhhh');
+    let token = jwt.sign({email: email},'secret', { expiresIn: 60 * 60 },  'shhhhh');
     res.status(200).json({msg: 'success', token: token, user: {
         email: userFind.email,
         firstName: userFind.firstName,
