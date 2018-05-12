@@ -9,7 +9,7 @@ const userRouter = require('./api/routers/user.router');
 const categoryRouter = require('./api/routers/categoy.router');
 const publisherRouter = require('./api/routers/publisher.router');
 const bookRouter = require('./api/routers/book.router');
-
+const authorRouter = require('./api/routers/author.router');
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/fashion_book_db');
 
@@ -22,6 +22,7 @@ userRouter(app);
 categoryRouter(app);
 publisherRouter(app);
 bookRouter(app);
+authorRouter(app);
 
 app.get('/', (req, res) => {res.send('welcome to fashtion_book')})
 

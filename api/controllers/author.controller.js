@@ -12,3 +12,13 @@ exports.getIDBySearchText = async (searchText) => {
     }
     return arr.map(i => i.id);
 }
+
+exports.getAll = (req, res) => {
+    author.find({}, (err, docs) => {
+        if(err){
+            res.status(500).json({msg: err});
+            return;
+        }
+        res.status(200).json({data: docs})
+    })
+}
