@@ -219,6 +219,7 @@ exports.getBookByCategory = async (req, res) => {
     //Khoang gia
     let range = null;
     let objRange = null;
+    console.log(req.body.range)
     if (typeof req.body.range !== 'undefined') {
         range = req.body.range;
         objRange = JSON.parse(range);
