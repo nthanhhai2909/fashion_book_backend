@@ -20,7 +20,6 @@ exports.mycomment = async (req, res) => {
         res.status(422).json({ msg: ' ID book Invalid data' });
         return;
     }
-    console.log(bookFind)
     const new_comment = _comment ({
         id_user: id_user,
         id_book: id_book,
@@ -37,4 +36,21 @@ exports.mycomment = async (req, res) => {
     }
     res.status(201).json({ msg: 'success' })
     return
+}
+
+exports.getCommentByIDBook = async (req, res) => {
+    if(typeof req.params.id_book === 'undefined'){
+        res.status(422).json({ msg: 'Invalid data' })
+        return;
+    }
+    let commentFind
+    try {
+        commentFind = await _comment.find({id_book: req.params.id_book})
+    }
+    catch(err) {
+        console.log(err);
+        res.status(500).json({ msg: err });
+        return;
+    }
+    res.status(200).json({data: commentFind})
 }
