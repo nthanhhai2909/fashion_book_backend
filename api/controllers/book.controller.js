@@ -423,11 +423,11 @@ exports.getBookByID = async (req, res) => {
 }
 
 exports.getRelatedBook = async (req, res) => {
-    if (typeof req.body.bookId === 'undefined') {
+    if (typeof req.params.bookId === 'undefined') {
         res.status(422).json({ msg: 'Invalid data' });
         return;
     }
-    let { bookId } = req.body;
+    let { bookId } = req.params;
     let bookObj = null;
     try {
         bookObj = await book.findById(bookId);

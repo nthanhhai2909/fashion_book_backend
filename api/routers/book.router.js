@@ -19,6 +19,6 @@ module.exports = (app) => {
     app.route('/book/:id')
         .get(book_controller.getBookByID)
 
-    app.route('/book/related')
-        .post(book_controller.getRelatedBook)
+    app.route('/book/related/:bookId')
+        .get(book_controller.getRelatedBook)
 }
