@@ -7,6 +7,15 @@ const bill = new Schema ({
         type: String,
         required: [true, "can't be blank"],
         index: true,
+    },
+    date: {
+        type: Date,
+        default: new Date()
+    },
+    products: {
+        type: Array,
+        required : true,
+        minlength: 1,
     }
 })
 
