@@ -10,6 +10,7 @@ cloudinary.config({
 const book = require('../models/book.model');
 const user = require('../models/user.model');
 const category = require('../models/category.model');
+const author = require('../models/author.model');
 const publisher = require('../models/publisher.model');
 
 exports.updateBook = async (req, res) => {
@@ -257,4 +258,34 @@ exports.updateCategory = async (req, res) => {
         return;
     }
     res.status(201).json({ msg: 'success', category: { name: name } });
+}
+
+exports.addAuthor = async (req, res) => {
+    if (typeof req.body.name === 'undefined') {
+        res.status(422).json({ msg: 'Invalid data' });
+        return;
+    }
+    let { name } = req.body;
+    let authorFind;
+    try {
+        authorFind = await author.find({ 'name': name });
+    }
+    catch (err) {
+        res.status(500).json({ msg: err });
+        return;
+    }
+    if (authorFind.length > 0) {
+        res.status(409).json({ msg: 'Author already exist' });
+        return;
+    }
+    const newAuthor = new category({ name: name });
+    try {
+        await newAuthor.save();
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ msg: err });
+        return;
+    }
+    res.status(201).json({ msg: 'success' });
 }
