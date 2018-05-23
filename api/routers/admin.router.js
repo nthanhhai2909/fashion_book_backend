@@ -7,6 +7,8 @@ module.exports = (app) => {
         .get(admin_controller.deletebook);
     app.route('/admin/updateuser')
         .post(admin_controller.updateUser);
+    app.route('/admin/deleteuser/:email')
+        .get(admin_controller.deleteUser);
     app.route('/admin/addpublisher')
        .post(admin_controller.addPublisher);
     app.route('/admin/updatepublisher')
