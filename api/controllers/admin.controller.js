@@ -226,3 +226,35 @@ exports.addCategory = async (req, res) => {
     }
     res.status(201).json({ msg: 'success' });
 }
+
+exports.updateCategory = async (req, res) => {
+    if (typeof req.body.id === 'undefined'
+        || typeof req.body.name === 'undefined'
+    ) {
+        res.status(422).json({ msg: 'Invalid data' });
+        return;
+    }
+    let { id, name } = req.body;
+    let categoryFind;
+    try {
+        categoryFind = await category.findById(id);
+    }
+    catch (err) {
+        res.status(500).json({ msg: err });
+        return;
+    }
+    if (categoryFind === null) {
+        res.status(422).json({ msg: "not found" });
+        return;
+    }
+    categoryFind.name = name;
+    try {
+        await categoryFind.save();
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ msg: err });
+        return;
+    }
+    res.status(201).json({ msg: 'success', category: { name: name } });
+}
