@@ -48,3 +48,21 @@ exports.updateBook = async (req, res) => {
     });
     res.status(200).json({ msg: 'success', data: bookFind });
 }
+
+exports.deletebook = async (req, res) => {
+    if (typeof req.params.id === 'undefined') {
+        res.status(422).json({ msg: 'Invalid data' });
+        return;
+    }
+    let bookFind;
+    try {
+        bookFind = await book.findById(req.params.id);
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).json({ msg: err })
+        return;
+    }
+    bookFind.remove();
+    res.status(200).json({ msg: 'success',});
+}
