@@ -11,4 +11,6 @@ module.exports = (app) => {
         .get(admin_controller.deleteUser);
     app.route('/admin/addcategory')
         .post(admin_controller.addCategory);
+    app.route('/admin/updatecategory')
+        .post(admin_controller.updateCategory);
 }
