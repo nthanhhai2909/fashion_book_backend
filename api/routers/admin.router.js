@@ -15,4 +15,6 @@ module.exports = (app) => {
         .post(admin_controller.updateCategory);
     app.route('/admin/addauthor')
         .post(admin_controller.addAuthor);
+    app.route('/admin/updateauthor')
+        .post(admin_controller.updateAuthor);
 }

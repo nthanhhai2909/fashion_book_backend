@@ -224,3 +224,35 @@ exports.addAuthor = async (req, res) => {
     }
     res.status(201).json({ msg: 'success' });
 }
+
+exports.updateAuthor = async (req, res) => {
+    if (typeof req.body.id === 'undefined'
+        || typeof req.body.name === 'undefined'
+    ) {
+        res.status(422).json({ msg: 'Invalid data' });
+        return;
+    }
+    let { id, name } = req.body;
+    let authorFind;
+    try {
+        authorFind = await author.findById(id);
+    }
+    catch (err) {
+        res.status(500).json({ msg: err });
+        return;
+    }
+    if (authorFind === null) {
+        res.status(422).json({ msg: "not found" });
+        return;
+    }
+    authorFind.name = name;
+    try {
+        await authorFind.save();
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ msg: err });
+        return;
+    }
+    res.status(201).json({ msg: 'success', author: { name: name } });
+}
