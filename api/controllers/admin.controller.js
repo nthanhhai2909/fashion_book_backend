@@ -113,3 +113,20 @@ exports.updateUser = async (req, res) => {
         is_admin: userFind.is_admin
     }});
 }
+
+exports.deleteUser = async (req, res) => {
+    if (typeof req.params.email === 'undefined') {
+        res.status(422).json({ msg: 'Invalid data' });
+        return;
+    }
+    let userFind;
+    try {
+        userFind = await user.findOne({'email': req.params.email})
+    }
+    catch(err) {
+        res.status(500).json({ msg: err });
+        return;
+    }
+    userFind.remove();
+    res.status(200).json({ msg: 'success'});
+}
