@@ -8,6 +8,7 @@ cloudinary.config({
 });
 
 const book = require('../models/book.model');
+const user = require('../models/user.model');
 
 exports.updateBook = async (req, res) => {
     var formData = new FormData();
@@ -65,4 +66,50 @@ exports.deletebook = async (req, res) => {
     }
     bookFind.remove();
     res.status(200).json({ msg: 'success',});
+}
+
+exports.updateUser = async (req, res) => {
+    if (typeof req.body.email === 'undefined'
+        || typeof req.body.firstName === 'undefined'
+        || typeof req.body.lastName === 'undefined'
+        || typeof req.body.address === 'undefined'
+        || typeof req.body.phone_number === 'undefined'
+        || typeof req.body.is_admin === 'undefined'
+    ) {
+        res.status(422).json({ msg: 'Invalid data' });
+        return;
+    }
+    let { email, firstName, lastName, address, phone_number, is_admin } = req.body;
+    let userFind;
+    try {
+        userFind = await user.findOne({'email': email})
+    }
+    catch(err) {
+        res.status(500).json({ msg: err });
+        return;
+    }
+    if(userFind === null) {
+        res.status(422).json({ msg: "not found" });
+        return;
+    }
+    userFind.firstName = firstName;
+    userFind.lastName = lastName;
+    userFind.address = address;
+    userFind.phone_number = phone_number;
+    userFind.is_admin = is_admin;
+    try {
+        await userFind.save()
+    }
+    catch(err) {
+        res.status(500).json({ msg: err });
+        return;
+    }
+    res.status(200).json({msg: 'success', user: {
+        email: userFind.email,
+        firstName: userFind.firstName,
+        lastName: userFind.lastName,
+        address: userFind.address,
+        phone_number: userFind.phone_number,
+        is_admin: userFind.is_admin
+    }});
 }
