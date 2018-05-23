@@ -278,7 +278,7 @@ exports.addAuthor = async (req, res) => {
         res.status(409).json({ msg: 'Author already exist' });
         return;
     }
-    const newAuthor = new category({ name: name });
+    const newAuthor = new author({ name: name });
     try {
         await newAuthor.save();
     }

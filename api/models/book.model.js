@@ -18,7 +18,8 @@ const book = new Schema({
     },
     release_date: {
         type: Date,
-        $dateToString: { format: "%Y-%m-%d", date: "$date" }
+        $dateToString: { format: "%Y-%m-%d", date: "$date" },
+        default: new Date()
     },
     img: {
         type: String,
