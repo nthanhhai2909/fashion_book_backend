@@ -213,7 +213,7 @@ exports.addCategory = async (req, res) => {
         return;
     }
     if (categoryFind.length > 0) {
-        res.status(409).json({ msg: 'Email already exist' });
+        res.status(409).json({ msg: 'Category already exist' });
         return;
     }
     const newCategory = new category({ name: name });
