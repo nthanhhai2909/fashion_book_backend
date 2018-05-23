@@ -5,4 +5,6 @@ module.exports = (app) => {
         .post(admin_controller.updateBook);
     app.route('/admin/deletebook/:id')
         .get(admin_controller.deletebook);
+    app.route('/admin/updateuser')
+        .post(admin_controller.updateUser);
 }
