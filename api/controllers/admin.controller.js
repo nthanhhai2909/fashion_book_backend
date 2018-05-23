@@ -12,6 +12,7 @@ const user = require('../models/user.model');
 const category = require('../models/category.model');
 const author = require('../models/author.model');
 const publisher = require('../models/publisher.model');
+const bcrypt = require('bcrypt');
 
 exports.updateBook = async (req, res) => {
     var formData = new FormData();
@@ -320,4 +321,50 @@ exports.updateAuthor = async (req, res) => {
         return;
     }
     res.status(201).json({ msg: 'success', author: { name: name } });
+}
+
+exports.addUser = async (req, res) => {
+    if ((typeof req.body.email === 'undefined')
+        || (typeof req.body.password === 'undefined')
+        || typeof req.body.firstName === 'undefined'
+        || typeof req.body.lastName === 'undefined'
+        || typeof req.body.address === 'undefined'
+        || typeof req.body.phone_number === 'undefined'
+    ) {
+        res.status(422).json({ msg: 'Invalid data' });
+        return;
+    }
+    let { email, password, firstName, lastName, address, birthday, phone_number } = req.body;
+    let userFind = null;
+    try {
+        userFind = await user.find({ 'email': email });
+    }
+    catch (err) {
+        res.status(500).json({ msg: err });
+        return;
+    }
+    if (userFind.length > 0) {
+        res.status(409).json({ msg: 'Email already exist' });
+        return;
+    }
+    password = bcrypt.hashSync(password, 10);
+    const newUser = new user({
+        email: email,
+        firstName: firstName,
+        lastName: lastName,
+        password: password,
+        address: address,
+        birthday: birthday,
+        phone_number: phone_number,
+        is_verify: true
+    });
+    try {
+        await newUser.save();
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ msg: err });
+        return;
+    }
+    res.status(201).json({ msg: 'success' });
 }
