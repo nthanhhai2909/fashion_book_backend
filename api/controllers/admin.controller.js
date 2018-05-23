@@ -10,6 +10,7 @@ cloudinary.config({
 const book = require('../models/book.model');
 const user = require('../models/user.model');
 const category = require('../models/category.model');
+const publisher = require('../models/publisher.model');
 
 exports.updateBook = async (req, res) => {
     var formData = new FormData();
@@ -66,7 +67,7 @@ exports.deletebook = async (req, res) => {
         return;
     }
     bookFind.remove();
-    res.status(200).json({ msg: 'success',});
+    res.status(200).json({ msg: 'success', });
 }
 
 exports.updateUser = async (req, res) => {
@@ -83,13 +84,13 @@ exports.updateUser = async (req, res) => {
     let { email, firstName, lastName, address, phone_number, is_admin } = req.body;
     let userFind;
     try {
-        userFind = await user.findOne({'email': email})
+        userFind = await user.findOne({ 'email': email })
     }
-    catch(err) {
+    catch (err) {
         res.status(500).json({ msg: err });
         return;
     }
-    if(userFind === null) {
+    if (userFind === null) {
         res.status(422).json({ msg: "not found" });
         return;
     }
@@ -101,18 +102,82 @@ exports.updateUser = async (req, res) => {
     try {
         await userFind.save()
     }
-    catch(err) {
+    catch (err) {
         res.status(500).json({ msg: err });
         return;
     }
-    res.status(200).json({msg: 'success', user: {
-        email: userFind.email,
-        firstName: userFind.firstName,
-        lastName: userFind.lastName,
-        address: userFind.address,
-        phone_number: userFind.phone_number,
-        is_admin: userFind.is_admin
-    }});
+    res.status(200).json({
+        msg: 'success', user: {
+            email: userFind.email,
+            firstName: userFind.firstName,
+            lastName: userFind.lastName,
+            address: userFind.address,
+            phone_number: userFind.phone_number,
+            is_admin: userFind.is_admin
+        }
+    });
+}
+
+exports.addPublisher = async (req, res) => {
+    if (typeof req.body.name === 'undefined') {
+        res.status(422).json({ msg: 'Invalid data' });
+        return;
+    }
+    let { name } = req.body;
+    let publisherFind;
+    try {
+        publisherFind = await publisher.find({ 'name': name });
+    }
+    catch (err) {
+        res.status(500).json({ msg: err });
+        return;
+    }
+    if (publisherFind.length > 0) {
+        res.status(409).json({ msg: 'Publisher already exist' });
+        return;
+    }
+    const newPublisher = new publisher({ name: name });
+    try {
+        await newPublisher.save();
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ msg: err });
+        return;
+    }
+    res.status(201).json({ msg: 'success' });
+}
+
+exports.updatePublisher = async (req, res) => {
+    if (typeof req.body.id === 'undefined'
+        || typeof req.body.name === 'undefined'
+    ) {
+        res.status(422).json({ msg: 'Invalid data' });
+        return;
+    }
+    let { id, name } = req.body;
+    let publisherFind;
+    try {
+        publisherFind = await publisher.findById(id);
+    }
+    catch (err) {
+        res.status(500).json({ msg: err });
+        return;
+    }
+    if (publisherFind === null) {
+        res.status(422).json({ msg: "not found" });
+        return;
+    }
+    publisherFind.name = name;
+    try {
+        await publisherFind.save();
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ msg: err });
+        return;
+    }
+  res.status(201).json({ msg: 'success', publisher: { name: name } });
 }
 
 exports.deleteUser = async (req, res) => {
