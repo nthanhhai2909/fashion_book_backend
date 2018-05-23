@@ -9,6 +9,7 @@ cloudinary.config({
 
 const book = require('../models/book.model');
 const user = require('../models/user.model');
+const category = require('../models/category.model');
 
 exports.updateBook = async (req, res) => {
     var formData = new FormData();
@@ -129,4 +130,34 @@ exports.deleteUser = async (req, res) => {
     }
     userFind.remove();
     res.status(200).json({ msg: 'success'});
+}
+
+exports.addCategory = async (req, res) => {
+    if (typeof req.body.name === 'undefined') {
+        res.status(422).json({ msg: 'Invalid data' });
+        return;
+    }
+    let { name } = req.body;
+    let categoryFind;
+    try {
+        categoryFind = await category.find({ 'name': name });
+    }
+    catch (err) {
+        res.status(500).json({ msg: err });
+        return;
+    }
+    if (categoryFind.length > 0) {
+        res.status(409).json({ msg: 'Email already exist' });
+        return;
+    }
+    const newCategory = new category({ name: name });
+    try {
+        await newCategory.save();
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ msg: err });
+        return;
+    }
+    res.status(201).json({ msg: 'success' });
 }

@@ -9,4 +9,6 @@ module.exports = (app) => {
         .post(admin_controller.updateUser);
     app.route('/admin/deleteuser/:email')
         .get(admin_controller.deleteUser);
+    app.route('/admin/addcategory')
+        .post(admin_controller.addCategory);
 }
