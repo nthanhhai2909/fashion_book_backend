@@ -13,12 +13,14 @@ const authorRouter = require('./api/routers/author.router');
 const commentRouter = require('./api/routers/comment.router');
 const billRouter = require('./api/routers/bill.router');
 const cartRouter = require('./api/routers/cart.router');
+const adminRouter = require('./api/routers/admin.router');
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/fashion_book_db');
 
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit:50000}));
+//app.use(bodyParser.json());
+//app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
 
 userRouter(app);
@@ -29,6 +31,7 @@ authorRouter(app);
 commentRouter(app)
 billRouter(app);
 cartRouter(app);
+adminRouter(app);
 app.get('/', (req, res) => {res.send('welcome to fashtion_book')})
 
 app.listen(port, () => console.log("server running on port " + port));
