@@ -183,13 +183,13 @@ exports.updatePublisher = async (req, res) => {
 }
 
 exports.deleteUser = async (req, res) => {
-    if (typeof req.params.email === 'undefined') {
+    if (typeof req.body.email === 'undefined') {
         res.status(422).json({ msg: 'Invalid data' });
         return;
     }
     let userFind;
     try {
-        userFind = await user.findOne({'email': req.params.email})
+        userFind = await user.findOne({'email': req.body.email})
     }
     catch(err) {
         res.status(500).json({ msg: err });
@@ -329,17 +329,19 @@ exports.addUser = async (req, res) => {
         || typeof req.body.lastName === 'undefined'
         || typeof req.body.address === 'undefined'
         || typeof req.body.phone_number === 'undefined'
+        || typeof req.body.is_admin === 'undefined'
     ) {
         res.status(422).json({ msg: 'Invalid data' });
         return;
     }
-    let { email, password, firstName, lastName, address, birthday, phone_number } = req.body;
+    let { email, password, firstName, lastName, address, phone_number, is_admin } = req.body;
     let userFind = null;
     try {
         userFind = await user.find({ 'email': email });
     }
     catch (err) {
         res.status(500).json({ msg: err });
+        console.log(1)
         return;
     }
     if (userFind.length > 0) {
@@ -353,9 +355,9 @@ exports.addUser = async (req, res) => {
         lastName: lastName,
         password: password,
         address: address,
-        birthday: birthday,
         phone_number: phone_number,
-        is_verify: true
+        is_verify: true,
+        is_admin: is_admin
     });
     try {
         await newUser.save();
