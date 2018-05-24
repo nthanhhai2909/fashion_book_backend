@@ -1,6 +1,16 @@
 'use strict'
 const admin_controller = require('../controllers/admin.controller');
+const multer = require('multer')
+const storage = multer.diskStorage({
+    destination: './files',
+    filename(req, file, cb) {
+      cb(null, `${new Date()}-${file.originalname}`);
+    },
+  });
+  const upload = multer({ storage });
 module.exports = (app) => {
+    app.route('/admin/addbook')
+        .post(upload.single('file'), admin_controller.addBook);
     app.route('/admin/updatebook')
         .post(admin_controller.updateBook);
     app.route('/admin/deletebook/:id')

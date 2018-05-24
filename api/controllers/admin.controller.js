@@ -13,7 +13,56 @@ const category = require('../models/category.model');
 const author = require('../models/author.model');
 const publisher = require('../models/publisher.model');
 const bcrypt = require('bcrypt');
-
+const uploadImg = async (path) => {
+    let res
+    try {
+        res = await cloudinary.uploader.upload(path)
+    }
+    catch(err) {
+        console.log(err)
+        return false
+    }
+    return res.secure_url
+}
+exports.addBook = async (req, res) => {
+    if(typeof req.file === 'undefined' 
+    || typeof req.body.name === 'undefined' 
+    || typeof req.body.id_category === 'undefined' 
+    || typeof req.body.price === 'undefined' 
+    || typeof req.body.release_date === 'undefined' 
+    || typeof req.body.describe === 'undefined' 
+    || typeof req.body.id_nsx === 'undefined' 
+    || typeof req.body.id_author === 'undefined' 
+    ) {
+        res.status(422).json({ msg: 'Invalid data' });
+        return;
+    }
+    const {id_category, name, price, release_date, describe, id_nsx, id_author} = req.body;
+    let urlImg = await uploadImg(req.file.path)
+    if(urlImg === false) {
+        res.status(500).json({msg: 'server error'});
+        return;
+    }
+    const newBook = new book({
+        id_category:id_category,
+        name: name,
+        price: price,
+        release_date: release_date,
+        img: urlImg,
+        describe: describe,
+        id_nsx: id_nsx,
+        id_author: id_author
+    })
+    try{
+        newBook.save()
+    }
+    catch(err) {
+        res.status(500).json({msg: 'server error'});
+        return;
+    }
+    res.status(201).json({msg: 'success'})
+    
+}
 exports.updateBook = async (req, res) => {
     var formData = new FormData();
     formData.get(img);
