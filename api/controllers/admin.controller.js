@@ -321,3 +321,12 @@ exports.updateAuthor = async (req, res) => {
     }
     res.status(201).json({ msg: 'success', author: { name: name } });
 }
+exports.getAllUser = async(req, res) => {
+    user.find({}, (err, docs) => {
+        if(err){
+            res.status(500).json({msg: err});
+            return;
+        }
+        res.status(200).json({data: docs})
+    })
+}
