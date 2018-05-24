@@ -279,7 +279,7 @@ exports.addAuthor = async (req, res) => {
         res.status(409).json({ msg: 'Author already exist' });
         return;
     }
-    const newAuthor = new category({ name: name });
+    const newAuthor = new author({ name: name });
     try {
         await newAuthor.save();
     }
@@ -322,7 +322,6 @@ exports.updateAuthor = async (req, res) => {
     }
     res.status(201).json({ msg: 'success', author: { name: name } });
 }
-
 exports.addUser = async (req, res) => {
     if ((typeof req.body.email === 'undefined')
         || (typeof req.body.password === 'undefined')
@@ -367,4 +366,13 @@ exports.addUser = async (req, res) => {
         return;
     }
     res.status(201).json({ msg: 'success' });
+}
+exports.getAllUser = async(req, res) => {
+    user.find({}, (err, docs) => {
+        if(err){
+            res.status(500).json({msg: err});
+            return;
+        }
+        res.status(200).json({data: docs})
+    })
 }

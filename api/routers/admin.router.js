@@ -23,4 +23,6 @@ module.exports = (app) => {
        .post(admin_controller.updatePublisher);
     app.route('/admin/adduser')
        .post(admin_controller.addUser);
+    app.route('/admin/getAllUser')
+       .get(admin_controller.getAllUser);
 }
