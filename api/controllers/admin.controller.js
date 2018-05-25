@@ -61,7 +61,10 @@ exports.addBook = async (req, res) => {
         res.status(500).json({msg: 'server error'});
         return;
     }
-    fs.unlink(req.file.path)
+    fs.unlink(req.file.path, (err) => {
+        if (err) throw err;
+        console.log('path/file.txt was deleted');
+      });
     res.status(201).json({msg: 'success'})
     
 }
