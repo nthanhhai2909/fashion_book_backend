@@ -13,6 +13,7 @@ const category = require('../models/category.model');
 const author = require('../models/author.model');
 const publisher = require('../models/publisher.model');
 const bcrypt = require('bcrypt');
+const fs = require('fs');
 const uploadImg = async (path) => {
     let res
     try {
@@ -60,6 +61,7 @@ exports.addBook = async (req, res) => {
         res.status(500).json({msg: 'server error'});
         return;
     }
+    fs.unlink(req.file.path)
     res.status(201).json({msg: 'success'})
     
 }
