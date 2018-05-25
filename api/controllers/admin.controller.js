@@ -69,19 +69,22 @@ exports.addBook = async (req, res) => {
     
 }
 exports.updateBook = async (req, res) => {
-    var formData = new FormData();
-    formData.get(img);
-    console.log(req.file);
-    if (typeof req.body.name === 'undefined'
+    if (typeof req.file === 'undefined'
+        || typeof req.body.id === 'undefined'
+        || typeof req.body.name === 'undefined'
         || typeof req.body.price === 'undefined'
         || typeof req.body.release_date === 'undefined'
-        || typeof req.body.img === 'undefined'
         || typeof req.body.describe === 'undefined'
     ) {
         res.status(422).json({ msg: 'Invalid data' });
         return;
     }
-    let { id, name, price, release_date, img, describe } = req.body;
+    let { id, name, price, release_date, describe } = req.body;
+    let urlImg = await uploadImg(req.file.path);
+    if (urlImg === false) {
+        res.status(500).json({ msg: 'server error' });
+        return;
+    }
     let bookFind;
     try {
         bookFind = await book.findById(id);
@@ -95,15 +98,21 @@ exports.updateBook = async (req, res) => {
         res.status(404).json({ msg: "Not found" })
         return;
     }
-    cloudinary.uploader.upload(img, function (error, result) { bookFind.img = result.secure_url });
     bookFind.name = name;
     bookFind.price = price;
     bookFind.release_date = release_date;
+    bookFind.img = urlImg;
     bookFind.describe = describe;
-    bookFind.save((err, docs) => {
-        if (err) {
-            console.log(err);
-        }
+    try {
+        bookFind.save()
+    }
+    catch (err) {
+        res.status(500).json({ msg: 'server error' });
+        return;
+    }
+    fs.unlink(req.file.path, (err) => {
+        if (err) throw err;
+        console.log('path/file.txt was deleted');
     });
     res.status(200).json({ msg: 'success', data: bookFind });
 }
