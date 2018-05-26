@@ -39,18 +39,31 @@ exports.mycomment = async (req, res) => {
 }
 
 exports.getCommentByIDBook = async (req, res) => {
-    if(typeof req.params.id_book === 'undefined'){
+    if(typeof req.body.id_book === 'undefined'
+    || typeof req.body.page === 'undefined'){
         res.status(422).json({ msg: 'Invalid data' })
         return;
     }
-    let commentFind
-    try {
-        commentFind = await _comment.find({id_book: req.params.id_book})
-    }
-    catch(err) {
-        console.log(err);
-        res.status(500).json({ msg: err });
+    let {id_book, page } = req.body;
+    let count = await _comment.count({})
+    let totalPage = parseInt(((count - 1) / 9) + 1);
+    if ((parseInt(page) < 1) || (parseInt(page) > totalPage)) {
+        res.status(200).json({ data: [], msg: 'Invalid page', totalPage });
         return;
     }
-    res.status(200).json({data: commentFind})
+    let commentFind
+        commentFind = await _comment
+                        .find({id_book: id_book})
+                        .skip(9 * (parseInt(page) - 1))
+                        .limit(9)
+                        .sort({date: -1})
+                        .exec((err, docs) => {
+                            if (err) {
+                                console.log(err);
+                                res.status(500).json({ msg: err });
+                                return;
+                            }
+                            res.status(200).json({ data: docs, totalPage });
+                        });
+
 }
