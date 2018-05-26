@@ -69,8 +69,7 @@ exports.addBook = async (req, res) => {
     
 }
 exports.updateBook = async (req, res) => {
-    if(typeof req.file === 'undefined' 
-    || typeof req.body.name === 'undefined' 
+    if( typeof req.body.name === 'undefined' 
     || typeof req.body.id === 'undefined' 
     || typeof req.body.id_category === 'undefined' 
     || typeof req.body.price === 'undefined' 
@@ -96,11 +95,19 @@ exports.updateBook = async (req, res) => {
         res.status(404).json({ msg: "Not found" })
         return;
     }
-    let urlImg = await uploadImg(req.file.path)
-    if(urlImg === false) {
-        res.status(500).json({msg: 'server error'});
-        return;
+    let urlImg = null;
+    if(typeof req.file !== 'undefined' ) {
+        urlImg = await uploadImg(req.file.path)
     }
+    if(urlImg !== null) {
+        if(urlImg === false) {
+            res.status(500).json({msg: 'server error'});
+            return;
+        }
+    }
+    if(urlImg === null)
+        urlImg = bookFind.img;
+    
     bookFind.id_category = id_category;
     bookFind.name = name;
     bookFind.price = parseFloat(price)
