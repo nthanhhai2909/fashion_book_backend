@@ -45,11 +45,10 @@ exports.addToCart = async (req, res) => {
     if(index === -1) {
         cartFind.products.push(products)
     } else {
-        cartFind.products[index].count = parseInt(cartFind.products[index].count) + parseInt(products.count);
-        console.log(cartFind.products[index].count)
+        cartFind.products[index].count += Number(products.count);
     }
     try {
-        cartFind.save()
+        await cart.findByIdAndUpdate(cartFind._id, {$set: {products: cartFind.products}})
     }
     catch(err) {
         res.status(500).json({msg: err})
