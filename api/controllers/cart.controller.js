@@ -56,3 +56,16 @@ exports.addToCart = async (req, res) => {
     }
     res.status(200).json({msg: 'success'});
 }
+exports.getAll = async (req, res) => {
+    if(typeof req.params.id_user === 'undefined') {
+        res.status(422).json({msg: 'invalid data'});
+        return;
+    }
+    cart.find({id_user: req.params.id_user}, (err, docs) => {
+        if(err){
+            res.status(500).json({msg: err});
+            return;
+        }
+        res.status(200).json({data: docs})
+    })
+}
