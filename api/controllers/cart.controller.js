@@ -1,71 +1,76 @@
-'use strict'
-const cart = require('../models/cart.model');
+"use strict";
+const cart = require("../models/cart.model");
 exports.addToCart = async (req, res) => {
-    if(typeof req.body.id_user === 'undefined'
-    || typeof req.body.products === 'undefined') {
-        res.status(422).json({msg: 'invalid data'});
-        return;
-    }
-    const { id_user, products } = req.body;
-    var cartFind
+  if (
+    typeof req.body.id_user === "undefined" ||
+    typeof req.body.products === "undefined"
+  ) {
+    res.status(422).json({ msg: "invalid data" });
+    return;
+  }
+  const { id_user, products } = req.body;
+  var cartFind;
+  try {
+    cartFind = await cart.findOne({ id_user: id_user });
+  } catch (err) {
+    const cart_new = new cart({
+      id_user: id_user,
+      products: products
+    });
+    let cartsave;
     try {
-        cartFind = await cart.findOne({id_user: id_user})
+      cartsave = await cart_new.save();
+    } catch (err) {
+      res.status(500).json({ msg: err });
+      return;
     }
-    catch(err) {
-        const cart_new = new cart ({
-            id_user: id_user,
-            products: products
-        })
-        let cartsave;
-        try {
-            cartsave = await cart_new.save()
-        }
-        catch(err) {
-            res.status(500).json({msg: err})
-            return;
-        }
-        return;
+    return;
+  }
+  if (cartFind === null) {
+    const cart_new = new cart({
+      id_user: id_user,
+      products: products
+    });
+    let cartsave;
+    try {
+      cartsave = await cart_new.save();
+    } catch (err) {
+      res.status(500).json({ msg: err });
+      return;
     }
-    if(cartFind === null) {
-        const cart_new = new cart ({
-            id_user: id_user,
-            products: products
-        })
-        let cartsave;
-        try {
-            cartsave = await cart_new.save()
-        }
-        catch(err) {
-            res.status(500).json({msg: err})
-            return;
-        }
-        return;
-    }
-    let index = cartFind.products.findIndex(element => products._id === element._id)
-    if(index === -1) {
-        cartFind.products.push(products)
+    return;
+  }
+  for (let i = 0; i < products.length; i++) {
+    let index = cartFind.products.findIndex(
+      element => products[i]._id === element._id
+    );
+    if (index === -1) {
+      cartFind.products.push(products[i]);
     } else {
-        cartFind.products[index].count += Number(products.count);
+      cartFind.products[index].count += Number(products[i].count);
     }
-    try {
-        await cart.findByIdAndUpdate(cartFind._id, {$set: {products: cartFind.products}})
-    }
-    catch(err) {
-        res.status(500).json({msg: err})
-        return;
-    }
-    res.status(200).json({msg: 'success'});
-}
+  }
+
+  try {
+    await cart.findByIdAndUpdate(cartFind._id, {
+      $set: { products: cartFind.products }
+    });
+  } catch (err) {
+    res.status(500).json({ msg: err });
+    return;
+  }
+  res.status(200).json({ msg: "success" });
+};
 exports.getAll = async (req, res) => {
-    if(typeof req.params.id_user === 'undefined') {
-        res.status(422).json({msg: 'invalid data'});
-        return;
+  if (typeof req.params.id_user === "undefined") {
+    res.status(422).json({ msg: "invalid data" });
+    return;
+  }
+  cart.findOne({ id_user: req.params.id_user }, (err, docs) => {
+    if (err) {
+      res.status(500).json({ msg: err });
+      return;
     }
-    cart.find({id_user: req.params.id_user}, (err, docs) => {
-        if(err){
-            res.status(500).json({msg: err});
-            return;
-        }
-        res.status(200).json({data: docs})
-    })
-}
+    res.status(200).json({ data: docs });
+  });
+};
