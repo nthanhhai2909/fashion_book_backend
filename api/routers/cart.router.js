@@ -7,4 +7,6 @@ module.exports = (app) => {
         .get(cart_controller.getAll);
     app.route('/cart/update')
         .post(cart_controller.update);
+    app.route('/cart/delete')
+        .post(cart_controller.delete)
 }

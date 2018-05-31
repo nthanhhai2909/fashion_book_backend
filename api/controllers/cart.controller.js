@@ -75,41 +75,78 @@ exports.getAll = async (req, res) => {
   });
 };
 exports.update = async (req, res) => {
-    if (
-        typeof req.body.id_user === "undefined" ||
-        typeof req.body.product === "undefined" 
-      ) {
-        res.status(422).json({ msg: "invalid data" });
-        return;
-      }
-    const {id_user, product} = req.body;
-    var cartFind = null;
-    try {
-        cartFind = await cart.findOne({id_user: id_user});
-    }
-    catch(err) {
-        res.status(500).json({ msg: err });
-      return;
-    }
-    if(cartFind === null) {
-        res.status(404).json({ msg: "not found" });
-      return;
-    }
-    let index = cartFind.products.findIndex(
-        element => element._id === product._id
-    );
-    if(index === -1) {
-        res.status(404).json({ msg: "product not found in list" });
-      return;
-    }
-    cartFind.products[index].count = Number(product.count);
-    try {
-        await cart.findByIdAndUpdate(cartFind._id, {
-          $set: { products: cartFind.products }
-        });
-      } catch (err) {
-        res.status(500).json({ msg: err });
-        return;
-      }
-      res.status(200).json({ msg: "success" });
-}
+  if (
+    typeof req.body.id_user === "undefined" ||
+    typeof req.body.product === "undefined"
+  ) {
+    res.status(422).json({ msg: "invalid data" });
+    return;
+  }
+  const { id_user, product } = req.body;
+  var cartFind = null;
+  try {
+    cartFind = await cart.findOne({ id_user: id_user });
+  } catch (err) {
+    res.status(500).json({ msg: err });
+    return;
+  }
+  if (cartFind === null) {
+    res.status(404).json({ msg: "not found" });
+    return;
+  }
+  let index = cartFind.products.findIndex(
+    element => element._id === product._id
+  );
+  if (index === -1) {
+    res.status(404).json({ msg: "product not found in list" });
+    return;
+  }
+  cartFind.products[index].count = Number(product.count);
+  try {
+    await cart.findByIdAndUpdate(cartFind._id, {
+      $set: { products: cartFind.products }
+    });
+  } catch (err) {
+    res.status(500).json({ msg: err });
+    return;
+  }
+  res.status(200).json({ msg: "success" });
+};
+exports.delete = async (req, res) => {
+  if (
+    typeof req.body.id_user === "undefined" ||
+    typeof req.body.id_product === "undefined"
+  ) {
+    res.status(422).json({ msg: "invalid data" });
+    return;
+  }
+  const { id_user, id_product } = req.body;
+  var cartFind = null;
+  try {
+    cartFind = await cart.findOne({ id_user: id_user });
+  } catch (err) {
+    res.status(500).json({ msg: err });
+    return;
+  }
+  if (cartFind === null) {
+    res.status(404).json({ msg: "not found" });
+    return;
+  }
+  let index = cartFind.products.findIndex(
+    element => element._id === id_product
+  );
+  if (index === -1) {
+    res.status(404).json({ msg: "product not found in list" });
+    return;
+  }
+  cartFind.products.splice(index, 1);
+  try {
+    await cart.findByIdAndUpdate(cartFind._id, {
+      $set: { products: cartFind.products }
+    });
+  } catch (err) {
+    res.status(500).json({ msg: err });
+    return;
+  }
+  res.status(200).json({ msg: "success" });
+};
