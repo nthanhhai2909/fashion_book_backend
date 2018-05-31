@@ -5,4 +5,6 @@ module.exports = (app) => {
         .post(cart_controller.addToCart);
     app.route('/cart/:id_user')
         .get(cart_controller.getAll);
+    app.route('/cart/update')
+        .post(cart_controller.update);
 }
