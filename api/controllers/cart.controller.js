@@ -150,3 +150,19 @@ exports.delete = async (req, res) => {
   }
   res.status(200).json({ msg: "success" });
 };
+exports.removeCartByIDUser = async (id_user) => {
+  try {
+    cartFind = await cart.findOne({ id_user: id_user });
+  } catch (err) {
+    console.log(err)
+    return false;
+  }
+  try {
+    await cartFind.remove();
+  }
+  catch(err) {
+    console.log(err);
+    return false;
+  }
+  return true;
+}
