@@ -228,7 +228,7 @@ exports.getBookByCategory = async (req, res) => {
     console.log(req.body.range)
     if (typeof req.body.range !== 'undefined') {
         range = req.body.range;
-        objRange = JSON.parse(range);
+        objRange = range;
     }
     //Kiem tra text
     let searchText = "";
