@@ -13,10 +13,26 @@ const bill = new Schema ({
         default: new Date()
     },
     products: {
-        type: Array,
+        type: [
+            {
+                id_category: String,
+                name: String,
+                price: Number,
+                release_date: Date,
+                img: String,
+                describe: String, 
+                id_nsx: String,
+                id_nsx: String,
+                count: Number,
+                _id: String,
+            }
+        ],
         required : true,
         minlength: 1,
-    }
+    },
+    address: String,
+    phone: String,
+    
 })
 
 module.exports = mongoose.model('bill', bill);

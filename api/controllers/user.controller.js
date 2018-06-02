@@ -274,8 +274,8 @@ exports.updateInfor = async (req, res) => {
         firstName: userFind.firstName,
         lastName: userFind.lastName,
         address: userFind.address,
-        phone_number: userFind.phone_number
-
+        phone_number: userFind.phone_number,
+        id: userFind._id
     }});
 }
 
