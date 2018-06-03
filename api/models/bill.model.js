@@ -30,8 +30,15 @@ const bill = new Schema ({
         required : true,
         minlength: 1,
     },
+    city: String,
+    district: String,
+    ward: String,
     address: String,
     phone: String,
+    issend: {
+        type: Boolean,
+        default: false
+    }
     
 })
 
