@@ -92,7 +92,7 @@ exports.verifyPayment = async (req, res) => {
   try {
     await bill.findByIdAndUpdate(
       tokenFind._id,
-      { $set: { is_verify: true } },
+      { $set: { issend: true } },
       { new: true }
     );
   } catch (err) {
