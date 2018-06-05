@@ -29,7 +29,7 @@ exports.sendEmailForgotPassword = async (email, token) => {
     let mailOptions = {
         from: '"SHOOPER 👻" <nthanhhai2909@gmail.com>', // sender address
         to: email, // list of receivers
-        subject: 'Account Verification Token', // Subject line
+        subject: 'Forgot password Verification Token', // Subject line
         html: '<b>Forgot password</b>'
             + ' <br/>'
             + '<span>Please enter OTP below</span>'
@@ -49,7 +49,7 @@ exports.sendMailConfirmPayment = async (email, token) => {
     let mailOptions = {
         from: '"SHOOPER 👻" <confesstionceo@gmail.com>', // sender address
         to: email, // list of receivers
-        subject: 'Account Verification Token', // Subject line
+        subject: 'Payment Verification Token', // Subject line
         text: 'Hello my friend',
         html: '<b>verify your account</b>'
             + ' <br/>'
