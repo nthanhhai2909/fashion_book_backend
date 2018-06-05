@@ -5,7 +5,7 @@ const transporter = nodemailer.createTransport(
 
 exports.sendEmail = async (email, token) => {
     let mailOptions = {
-        from: '"CONFESSTION 👻" <confesstionceo@gmail.com>', // sender address
+        from: '"SHOOPER 👻" <confesstionceo@gmail.com>', // sender address
         to: email, // list of receivers
         subject: 'Account Verification Token', // Subject line
         text: 'Hello my friend',
@@ -27,7 +27,7 @@ exports.sendEmail = async (email, token) => {
 
 exports.sendEmailForgotPassword = async (email, token) => {
     let mailOptions = {
-        from: '"NTHANHHAI 👻" <nthanhhai2909@gmail.com>', // sender address
+        from: '"SHOOPER 👻" <nthanhhai2909@gmail.com>', // sender address
         to: email, // list of receivers
         subject: 'Account Verification Token', // Subject line
         html: '<b>Forgot password</b>'
@@ -35,6 +35,27 @@ exports.sendEmailForgotPassword = async (email, token) => {
             + '<span>Please enter OTP below</span>'
             + '<br/>'
             + '<span>' + token +  '</span>'
+    };
+    try{
+        let send = await transporter.sendMail(mailOptions);
+    }
+    catch(err){
+        console.log(err);
+        return false;
+    }
+    return true;
+}
+exports.sendMailConfirmPayment = async (email, token) => {
+    let mailOptions = {
+        from: '"SHOOPER 👻" <confesstionceo@gmail.com>', // sender address
+        to: email, // list of receivers
+        subject: 'Account Verification Token', // Subject line
+        text: 'Hello my friend',
+        html: '<b>verify your account</b>'
+            + ' <br/>'
+            + '<span>Please verify your account by clicking the link</span>'
+            + '<br/>'
+            + '<span>http://localhost:3000/payment/' + token +  '</span>'
     };
     try{
         let send = await transporter.sendMail(mailOptions);
