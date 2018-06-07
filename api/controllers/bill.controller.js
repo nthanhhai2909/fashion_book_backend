@@ -101,3 +101,19 @@ exports.verifyPayment = async (req, res) => {
   }
   res.status(200).json({ msg: "success!" });
 };
+exports.getBillByIDUser = async (req, res) => {
+  if( typeof req.params.id_user === 'undefined' ) {
+    res.status(402).json({msg: 'data invalid'});
+    return;
+  }
+  let billFind = null;
+  try {
+    billFind = await bill.find({id_user: req.params.id_user});
+  }
+  catch(err) {
+    console.log(err);
+    res.status(500).json({msg: "Server error"});
+    return;
+  }
+  res.status(200).json({data: billFind})
+}
