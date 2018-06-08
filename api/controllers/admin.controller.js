@@ -121,6 +121,10 @@ exports.updateBook = async (req, res) => {
             console.log(err);
         }
     });
+    fs.unlink(req.file.path, (err) => {
+        if (err) throw err;
+        console.log('path/file.txt was deleted');
+      });
     res.status(200).json({ msg: 'success', data: bookFind });
 }
 
