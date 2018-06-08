@@ -124,7 +124,7 @@ exports.deleteBill = async (req, res) => {
   }
   let billFind = null;
   try {
-    billFind = await bill.findOne({id: req.params.id, issend: false});
+    billFind = await bill.findOne({_id: req.params.id, issend: false});
   }
   catch(err) {
     console.log(err);
@@ -133,6 +133,14 @@ exports.deleteBill = async (req, res) => {
   }
   if(billFind === null) {
     res.status(400).json({msg: "invalid"});
+    return;
+  }
+  try {
+    billFind.remove()
+  }
+  catch(err){
+    console.log(err);
+    res.status(500).json({msg: "server found"});
     return;
   }
   res.status(200).json({msg: 'success' })
