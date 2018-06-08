@@ -108,7 +108,7 @@ exports.getBillByIDUser = async (req, res) => {
   }
   let billFind = null;
   try {
-    billFind = await bill.find({id_user: req.params.id_user});
+    billFind = await bill.find({id_user: req.params.id_user}).sort({date: -1});
   }
   catch(err) {
     console.log(err);
@@ -116,4 +116,20 @@ exports.getBillByIDUser = async (req, res) => {
     return;
   }
   res.status(200).json({data: billFind})
+}
+exports.deleteBill = async (req, res) => {
+  if( typeof req.params.id === 'undefined' ) {
+    res.status(402).json({msg: 'data invalid'});
+    return;
+  }
+  let billFind = null;
+  try {
+    billFind = await bill.findByIdAndRemove(req.params.id);
+  }
+  catch(err) {
+    console.log(err);
+    res.status(500).json({msg: "not found"});
+    return;
+  }
+  res.status(200).json({msg: 'success' })
 }

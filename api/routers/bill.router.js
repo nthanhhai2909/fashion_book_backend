@@ -7,4 +7,6 @@ module.exports = (app) => {
         .get(bill_controller.verifyPayment);
     app.route('/bill/:id_user')
         .get(bill_controller.getBillByIDUser);
+    app.route('/bill/delete/:id')
+        .get(bill_controller.deleteBill);
 }
