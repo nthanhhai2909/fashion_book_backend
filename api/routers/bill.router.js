@@ -9,4 +9,6 @@ module.exports = (app) => {
         .get(bill_controller.getBillByIDUser);
     app.route('/bill/delete/:id')
         .get(bill_controller.deleteBill);
+    app.route('/bill/top/')
+        .post(bill_controller.statisticalTop10);
 }

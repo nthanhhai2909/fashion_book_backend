@@ -1,8 +1,8 @@
 "use strict";
 const bill = require("../models/bill.model");
-const cart = require('../models/cart.model');
+const cart = require("../models/cart.model");
 const randomstring = require("randomstring");
-const nodemailer = require('../utils/nodemailer');
+const nodemailer = require("../utils/nodemailer");
 exports.addBill = async (req, res) => {
   if (
     typeof req.body.id_user === "undefined" ||
@@ -31,7 +31,7 @@ exports.addBill = async (req, res) => {
   try {
     cartFind = await cart.findOne({ id_user: id_user });
   } catch (err) {
-    console.log('error ', err)
+    console.log("error ", err);
     res.status(500).json({ msg: err });
     return;
   }
@@ -60,14 +60,14 @@ exports.addBill = async (req, res) => {
     await cartFind.remove();
   } catch (err) {
     res.status(500).json({ msg: err });
-    console.log("cart remove fail")
+    console.log("cart remove fail");
     return;
   }
   try {
     new_bill.save();
   } catch (err) {
     res.status(500).json({ msg: err });
-    console.log("save bill fail")
+    console.log("save bill fail");
     return;
   }
   res.status(201).json({ msg: "success" });
@@ -102,46 +102,74 @@ exports.verifyPayment = async (req, res) => {
   res.status(200).json({ msg: "success!" });
 };
 exports.getBillByIDUser = async (req, res) => {
-  if( typeof req.params.id_user === 'undefined' ) {
-    res.status(402).json({msg: 'data invalid'});
+  if (typeof req.params.id_user === "undefined") {
+    res.status(402).json({ msg: "data invalid" });
     return;
   }
   let billFind = null;
   try {
-    billFind = await bill.find({id_user: req.params.id_user}).sort({date: -1});
-  }
-  catch(err) {
+    billFind = await bill
+      .find({ id_user: req.params.id_user })
+      .sort({ date: -1 });
+  } catch (err) {
     console.log(err);
-    res.status(500).json({msg: "Server error"});
+    res.status(500).json({ msg: "Server error" });
     return;
   }
-  res.status(200).json({data: billFind})
-}
+  res.status(200).json({ data: billFind });
+};
 exports.deleteBill = async (req, res) => {
-  if( typeof req.params.id === 'undefined' ) {
-    res.status(402).json({msg: 'data invalid'});
+  if (typeof req.params.id === "undefined") {
+    res.status(402).json({ msg: "data invalid" });
     return;
   }
   let billFind = null;
   try {
-    billFind = await bill.findOne({_id: req.params.id, issend: false});
-  }
-  catch(err) {
+    billFind = await bill.findOne({ _id: req.params.id, issend: false });
+  } catch (err) {
     console.log(err);
-    res.status(500).json({msg: "server found"});
+    res.status(500).json({ msg: "server found" });
     return;
   }
-  if(billFind === null) {
-    res.status(400).json({msg: "invalid"});
+  if (billFind === null) {
+    res.status(400).json({ msg: "invalid" });
     return;
   }
   try {
-    billFind.remove()
-  }
-  catch(err){
+    billFind.remove();
+  } catch (err) {
     console.log(err);
-    res.status(500).json({msg: "server found"});
+    res.status(500).json({ msg: "server found" });
     return;
   }
-  res.status(200).json({msg: 'success' })
-}
+  res.status(200).json({ msg: "success" });
+};
+exports.statisticalTop10 = async (req, res) => {
+  let billFind = null;
+  try {
+    billFind = await bill.find({});
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ msg: err });
+    return;
+  }
+  let arr = [];
+  let len = billFind.length;
+  for (let i = 0; i < len; i++) {
+    let lenP = billFind[i].products.length;
+    for (let j = 0; j < lenP; j++) {
+      let index = arr.findIndex(
+        element => billFind[i].products[j]._id === element._id
+      );
+      if (index === -1) {
+        arr.push(billFind[i].products[j]);
+      } else {
+        arr[index].count += Number(billFind[i].products[j].count);
+      }
+    }
+  }
+  arr.sort(function(a,b){
+    return b.count - a.count;
+  })
+  res.status(200).json({data: arr.length > 10 ? arr.slice(0, 10) : arr});
+};
