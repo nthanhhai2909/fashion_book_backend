@@ -11,4 +11,6 @@ module.exports = (app) => {
         .get(bill_controller.deleteBill);
     app.route('/bill/top/')
         .post(bill_controller.statisticalTop10);
+    app.route('/bill/statistical/revenue/day')
+        .post(bill_controller.statisticaRevenueDay)
 }

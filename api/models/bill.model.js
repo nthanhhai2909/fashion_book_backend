@@ -10,7 +10,7 @@ const bill = new Schema({
   },
   date: {
     type: Date,
-    default: new Date()
+    default: Date.now,
   },
   products: {
     type: [
@@ -42,5 +42,4 @@ const bill = new Schema({
     default: false
   }
 });
-
 module.exports = mongoose.model("bill", bill);

@@ -3,6 +3,7 @@ const bill = require("../models/bill.model");
 const cart = require("../models/cart.model");
 const randomstring = require("randomstring");
 const nodemailer = require("../utils/nodemailer");
+const moment = require('moment');
 exports.addBill = async (req, res) => {
   if (
     typeof req.body.id_user === "undefined" ||
@@ -147,7 +148,7 @@ exports.deleteBill = async (req, res) => {
 exports.statisticalTop10 = async (req, res) => {
   let billFind = null;
   try {
-    billFind = await bill.find({});
+    billFind = await bill.find({issend: true});
   } catch (err) {
     console.log(err);
     res.status(500).json({ msg: err });
@@ -168,8 +169,29 @@ exports.statisticalTop10 = async (req, res) => {
       }
     }
   }
-  arr.sort(function(a,b){
+  arr.sort(function(a, b) {
     return b.count - a.count;
-  })
-  res.status(200).json({data: arr.length > 10 ? arr.slice(0, 10) : arr});
+  });
+  res.status(200).json({ data: arr.length > 10 ? arr.slice(0, 10) : arr });
+};
+exports.statisticaRevenueDay = async (req, res) => {
+  if (
+    typeof req.body.day === "undefined" ||
+    typeof req.body.month === "undefined" ||
+    typeof req.body.year === "undefined"
+  ) {
+    res.status(402).json({ msg: "data invalid" });
+    return;
+  }
+  let {day, month, year} = req.body;
+  let billFind = null;
+  try {
+    billFind = await bill.find({date: {"$gte": new Date(year, month - 1, day), "$lt": new Date(year, month - 1, day + 1)}, issend: true})
+  }
+  catch(err) {
+    console.log(err);
+    res.status(500).msg({msg: err});
+    return;
+  }
+  res.status(200).json({data: billFind})
 };
