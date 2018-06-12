@@ -13,6 +13,7 @@ const category = require('../models/category.model');
 const author = require('../models/author.model');
 const publisher = require('../models/publisher.model');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const uploadImg = async (path) => {
     let res
@@ -451,4 +452,43 @@ exports.getAllUser = async(req, res) => {
         }
         res.status(200).json({data: docs})
     })
+}
+exports.login = async (req, res) => {
+    if(typeof req.body.email === 'undefined'
+    || typeof req.body.password == 'undefined'){
+        res.status(402).json({msg: "Invalid data"});
+        return;
+    }
+    let { email, password } = req.body;
+    let userFind = null;
+    try{
+        userFind = await user.findOne({'email': email, 'is_admin': true});
+    }
+    catch(err){
+        res.json({msg: err});
+        return;
+    }
+    if(userFind == null){
+        res.status(422).json({msg: "Invalid data"});
+        return;
+    }
+
+    if(!userFind.is_verify){
+        res.status(401).json({msg: 'no_registration_confirmation'});
+        return;
+    }
+    
+    if(!bcrypt.compareSync(password, userFind.password)){
+        res.status(422).json({msg: 'Invalid data'});
+        return;
+    }
+    let token = jwt.sign({email: email,  iat: Math.floor(Date.now() / 1000) - 60 * 30}, 'shhhhh');
+    res.status(200).json({msg: 'success', token: token, user: {
+        email: userFind.email,
+        firstName: userFind.firstName,
+        lastName: userFind.lastName,
+        address: userFind.address,
+        phone_number: userFind.phone_number,
+        id: userFind._id
+    }});
 }

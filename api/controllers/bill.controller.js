@@ -195,3 +195,76 @@ exports.statisticaRevenueDay = async (req, res) => {
   }
   res.status(200).json({data: billFind})
 };
+exports.statisticaRevenueMonth = async (req, res) => {
+  if (
+    typeof req.body.year === "undefined" ||
+    typeof req.body.month === "undefined"
+  ) {
+    res.status(402).json({ msg: "data invalid" });
+    return;
+  }
+  let {month, year} = req.body;
+  let billFind = null;
+  try {
+    billFind = await bill.find({date: {"$gte": new Date(year, month - 1, 1), "$lt": new Date(year, month, 1)}, issend: true})
+  }
+  catch(err) {
+    console.log(err);
+    res.status(500).msg({msg: err});
+    return;
+  }
+  res.status(200).json({data: billFind})
+}
+exports.statisticaRevenueYear = async (req, res) => {
+  if (
+    typeof req.body.year === "undefined"
+  ) {
+    res.status(402).json({ msg: "data invalid" });
+    return;
+  }
+  let { year } = req.body;
+  let billFind = null;
+  try {
+    billFind = await bill.find({date: {"$gte": new Date(year, 0, 1), "$lt": new Date(year, 0, 1)}, issend: true})
+  }
+  catch(err) {
+    console.log(err);
+    res.status(500).msg({msg: err});
+    return;
+  }
+  res.status(200).json({data: billFind})
+}
+exports.statisticaRevenueQuauter = async (req, res) => {
+  if (
+    typeof req.body.year === "undefined" ||
+    typeof req.body.quauter === "undefined"
+  ) {
+    res.status(402).json({ msg: "data invalid" });
+    return;
+  }
+  let {month, quauter} = req.body;
+  if(quauter < 1 || quauter > 4) {
+    res.status(402).json({ msg: "data invalid" });
+    return;
+  }
+  let start = 1, end = 4;
+  if(parseInt(quauter) === 2) {
+    start = 4; end = 7;
+  }
+  if(parseInt(quauter) === 3) {
+    start = 7; end = 10;
+  }
+  if(parseInt(quauter) === 3) {
+    start = 10; end = 13;
+  }
+  let billFind = null;
+  try {
+    billFind = await bill.find({date: {"$gte": new Date(year, start - 1, 1), "$lt": new Date(year, end - 1, 1)}, issend: true})
+  }
+  catch(err) {
+    console.log(err);
+    res.status(500).msg({msg: err});
+    return;
+  }
+  res.status(200).json({data: billFind})
+}

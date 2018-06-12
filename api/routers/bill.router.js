@@ -12,5 +12,11 @@ module.exports = (app) => {
     app.route('/bill/top/')
         .post(bill_controller.statisticalTop10);
     app.route('/bill/statistical/revenue/day')
-        .post(bill_controller.statisticaRevenueDay)
+        .post(bill_controller.statisticaRevenueDay);
+    app.route('/bill/statistical/revenue/month')
+        .post(bill_controller.statisticaRevenueMonth);
+    app.route('/bill/statistical/revenue/year')
+        .post(bill_controller.statisticaRevenueYear);
+    app.route('/bill/statistical/revenue/quauter')
+        .post(bill_controller.statisticaRevenueQuauter);
 }

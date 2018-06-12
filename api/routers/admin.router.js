@@ -35,4 +35,6 @@ module.exports = (app) => {
        .post(admin_controller.addUser);
     app.route('/admin/getAllUser')
        .get(admin_controller.getAllUser);
+    app.route('/admin/login')
+       .post(admin_controller.login);
 }
