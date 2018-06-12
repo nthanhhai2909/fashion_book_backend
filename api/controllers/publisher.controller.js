@@ -1,7 +1,7 @@
 'use strict'
 const publisher = require('../models/publisher.model');
 
-exports.getAll = (req, res) => {
+exports.getAll = async (req, res) => {
     if(typeof req.params.page === 'undefined') {
         res.status(402).json({msg: 'Data invalid'});
         return;
