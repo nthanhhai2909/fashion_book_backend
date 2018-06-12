@@ -206,7 +206,7 @@ exports.statisticaRevenueMonth = async (req, res) => {
   let {month, year} = req.body;
   let billFind = null;
   try {
-    billFind = await bill.find({date: {"$gte": new Date(year, month - 1, 1), "$lt": new Date(year, month, 1)}, issend: true})
+    billFind = await bill.find({date: {"$gte": new Date(year, parseInt(month) - 1, 1), "$lt": new Date(year, month, 1)}, issend: true})
   }
   catch(err) {
     console.log(err);
