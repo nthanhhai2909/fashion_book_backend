@@ -33,7 +33,6 @@ exports.getAll = async (req, res) => {
         res.status(200).json({ data: [], msg: 'Invalid page', totalPage });
         return;
     }
-    
     author.find({})
     .skip(9 * (parseInt(page) - 1))
     .limit(9)
