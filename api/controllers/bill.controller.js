@@ -242,7 +242,7 @@ exports.statisticaRevenueQuauter = async (req, res) => {
     res.status(402).json({ msg: "data invalid" });
     return;
   }
-  let {month, quauter} = req.body;
+  let {year, quauter} = req.body;
   if(quauter < 1 || quauter > 4) {
     res.status(402).json({ msg: "data invalid" });
     return;
