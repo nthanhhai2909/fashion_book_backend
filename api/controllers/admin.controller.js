@@ -445,12 +445,35 @@ exports.addUser = async (req, res) => {
     res.status(201).json({ msg: 'success' });
 }
 exports.getAllUser = async(req, res) => {
-    user.find({}, (err, docs) => {
-        if(err){
-            res.status(500).json({msg: err});
-            return;
+    if(typeof req.params.page === 'undefined') {
+        res.status(402).json({msg: 'Data invalid'});
+        return;
+    }
+    let count = null;
+    try { 
+        count = await user.count({});
+    }
+    catch(err) {
+        console.log(err);
+        res.status(500).json({msg: err});
+        return;
+    }
+    let totalPage = parseInt(((count - 1) / 9) + 1);
+    let { page } = req.params;
+    if ((parseInt(page) < 1) || (parseInt(page) > totalPage)) {
+        res.status(200).json({ data: [], msg: 'Invalid page', totalPage });
+        return;
+    }
+    user.find({})
+    .skip(9 * (parseInt(page) - 1))
+    .limit(9)
+    .exec((err, docs) => {
+        if(err) {
+            console.log(err);
+                    res.status(500).json({ msg: err });
+                    return;
         }
-        res.status(200).json({data: docs})
+        res.status(200).json({ data: docs, totalPage });
     })
 }
 exports.login = async (req, res) => {
