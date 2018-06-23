@@ -19,4 +19,7 @@ module.exports = (app) => {
         .post(bill_controller.statisticaRevenueYear);
     app.route('/bill/statistical/revenue/quauter')
         .post(bill_controller.statisticaRevenueQuauter);
+    app.route('/bill/status/false')
+        .get(bill_controller.getBillNoVerify);
+
 }

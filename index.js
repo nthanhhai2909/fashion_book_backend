@@ -18,11 +18,11 @@ const addressVnRouter = require('./api/routers/addres.vn.router');
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/fashion_book_db');
 const address = require('./api/models/address.vn.model');
-const test =  async () => {
-    Object.keys(data).forEach( async function(k){
+const test = () => {
+    Object.keys(data).forEach( function(k){
         var _dic = [];
         var _ward = [];
-         Object.keys(data[k].district).forEach(  function(j) {
+         Object.keys(data[k].district).forEach(function(j) {
             Object.keys(data[k].district[j].ward).forEach( function(l) {
                 _ward.push({
                     name: data[k].district[j].ward[l].name,
@@ -42,14 +42,14 @@ const test =  async () => {
             code: data[k].code
         })
         try {
-            await new_address.save()
+            new_address.save()
         }
         catch(Err) {
             console.log(Err)
         }
     });
 }
-// // test()
+// test();
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit:50000}));
 app.use(cors())

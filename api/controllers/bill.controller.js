@@ -3,7 +3,6 @@ const bill = require("../models/bill.model");
 const cart = require("../models/cart.model");
 const randomstring = require("randomstring");
 const nodemailer = require("../utils/nodemailer");
-const moment = require('moment');
 exports.addBill = async (req, res) => {
   if (
     typeof req.body.id_user === "undefined" ||
@@ -148,7 +147,7 @@ exports.deleteBill = async (req, res) => {
 exports.statisticalTop10 = async (req, res) => {
   let billFind = null;
   try {
-    billFind = await bill.find({issend: true});
+    billFind = await bill.find({ issend: true });
   } catch (err) {
     console.log(err);
     res.status(500).json({ msg: err });
@@ -183,17 +182,22 @@ exports.statisticaRevenueDay = async (req, res) => {
     res.status(402).json({ msg: "data invalid" });
     return;
   }
-  let {day, month, year} = req.body;
+  let { day, month, year } = req.body;
   let billFind = null;
   try {
-    billFind = await bill.find({date: {"$gte": new Date(year, month - 1, day), "$lt": new Date(year, month - 1, parseInt(day) + 1)}, issend: true})
-  }
-  catch(err) {
+    billFind = await bill.find({
+      date: {
+        $gte: new Date(year, month - 1, day),
+        $lt: new Date(year, month - 1, parseInt(day) + 1)
+      },
+      issend: true
+    });
+  } catch (err) {
     console.log(err);
-    res.status(500).msg({msg: err});
+    res.status(500).msg({ msg: err });
     return;
   }
-  res.status(200).json({data: billFind})
+  res.status(200).json({ data: billFind });
 };
 exports.statisticaRevenueMonth = async (req, res) => {
   if (
@@ -203,37 +207,45 @@ exports.statisticaRevenueMonth = async (req, res) => {
     res.status(402).json({ msg: "data invalid" });
     return;
   }
-  let {month, year} = req.body;
+  let { month, year } = req.body;
   let billFind = null;
   try {
-    billFind = await bill.find({date: {"$gte": new Date(year, parseInt(month) - 1, 1), "$lt": new Date(year, month, 1)}, issend: true})
-  }
-  catch(err) {
+    billFind = await bill.find({
+      date: {
+        $gte: new Date(year, parseInt(month) - 1, 1),
+        $lt: new Date(year, month, 1)
+      },
+      issend: true
+    });
+  } catch (err) {
     console.log(err);
-    res.status(500).msg({msg: err});
+    res.status(500).msg({ msg: err });
     return;
   }
-  res.status(200).json({data: billFind})
-}
+  res.status(200).json({ data: billFind });
+};
 exports.statisticaRevenueYear = async (req, res) => {
-  if (
-    typeof req.body.year === "undefined"
-  ) {
+  if (typeof req.body.year === "undefined") {
     res.status(402).json({ msg: "data invalid" });
     return;
   }
   let { year } = req.body;
   let billFind = null;
   try {
-    billFind = await bill.find({date: {"$gte": new Date(year, 0, 1), "$lt": new Date(parseInt(year) + 1 , 0, 1)}, issend: true})
-  }
-  catch(err) {
+    billFind = await bill.find({
+      date: {
+        $gte: new Date(year, 0, 1),
+        $lt: new Date(parseInt(year) + 1, 0, 1)
+      },
+      issend: true
+    });
+  } catch (err) {
     console.log(err);
-    res.status(500).msg({msg: err});
+    res.status(500).msg({ msg: err });
     return;
   }
-  res.status(200).json({data: billFind})
-}
+  res.status(200).json({ data: billFind });
+};
 exports.statisticaRevenueQuauter = async (req, res) => {
   if (
     typeof req.body.year === "undefined" ||
@@ -242,29 +254,65 @@ exports.statisticaRevenueQuauter = async (req, res) => {
     res.status(402).json({ msg: "data invalid" });
     return;
   }
-  let {year, quauter} = req.body;
-  if(quauter < 1 || quauter > 4) {
+  let { year, quauter } = req.body;
+  if (quauter < 1 || quauter > 4) {
     res.status(402).json({ msg: "data invalid" });
     return;
   }
-  let start = 1, end = 4;
-  if(parseInt(quauter) === 2) {
-    start = 4; end = 7;
+  let start = 1,
+    end = 4;
+  if (parseInt(quauter) === 2) {
+    start = 4;
+    end = 7;
   }
-  if(parseInt(quauter) === 3) {
-    start = 7; end = 10;
+  if (parseInt(quauter) === 3) {
+    start = 7;
+    end = 10;
   }
-  if(parseInt(quauter) === 3) {
-    start = 10; end = 13;
+  if (parseInt(quauter) === 3) {
+    start = 10;
+    end = 13;
   }
   let billFind = null;
   try {
-    billFind = await bill.find({date: {"$gte": new Date(year, start - 1, 1), "$lt": new Date(year, end - 1, 1)}, issend: true})
-  }
-  catch(err) {
+    billFind = await bill.find({
+      date: {
+        $gte: new Date(year, start - 1, 1),
+        $lt: new Date(year, end - 1, 1)
+      },
+      issend: true
+    });
+  } catch (err) {
     console.log(err);
-    res.status(500).msg({msg: err});
+    res.status(500).msg({ msg: err });
     return;
   }
-  res.status(200).json({data: billFind})
-}
+  res.status(200).json({ data: billFind });
+};
+exports.getBillNoVerify = async (req, res) => {
+  let count = null;
+  try {
+    count = await bill.count({ issend: false });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ msg: err });
+    return;
+  }
+  let totalPage = parseInt((count - 1) / 9 + 1);
+  let { page } = req.params;
+  if (parseInt(page) < 1 || parseInt(page) > totalPage) {
+    res.status(200).json({ data: [], msg: "Invalid page", totalPage });
+    return;
+  }
+  bill.find({issend: false})
+    .skip(9 * (parseInt(page) - 1))
+    .limit(9)
+    .exec((err, docs) => {
+        if(err) {
+            console.log(err);
+                    res.status(500).json({ msg: err });
+                    return;
+        }
+        res.status(200).json({ data: docs, totalPage });
+    })
+};
