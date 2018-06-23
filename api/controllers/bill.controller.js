@@ -316,3 +316,30 @@ exports.getBillNoVerify = async (req, res) => {
         res.status(200).json({ data: docs, totalPage });
     })
 };
+exports.getBillVerify = async (req, res) => {
+  let count = null;
+  try {
+    count = await bill.count({ issend: true });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ msg: err });
+    return;
+  }
+  let totalPage = parseInt((count - 1) / 9 + 1);
+  let { page } = req.params;
+  if (parseInt(page) < 1 || parseInt(page) > totalPage) {
+    res.status(200).json({ data: [], msg: "Invalid page", totalPage });
+    return;
+  }
+  bill.find({issend: true})
+    .skip(9 * (parseInt(page) - 1))
+    .limit(9)
+    .exec((err, docs) => {
+        if(err) {
+            console.log(err);
+                    res.status(500).json({ msg: err });
+                    return;
+        }
+        res.status(200).json({ data: docs, totalPage });
+    })
+};

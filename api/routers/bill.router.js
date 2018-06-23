@@ -21,5 +21,8 @@ module.exports = (app) => {
         .post(bill_controller.statisticaRevenueQuauter);
     app.route('/bill/status/false')
         .get(bill_controller.getBillNoVerify);
+    app.route('/bill/status/true')
+        .get(bill_controller.getBillVerify);
+        
 
 }
