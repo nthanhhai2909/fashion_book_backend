@@ -66,3 +66,12 @@ exports.getNameByID = async(req, res) => {
     }
     res.status(200).json({name: result.name})
 }
+exports.getAuthor =  (req, res) => {
+    console.l
+    author.find({}, (err, docs) => {
+        if(err) {
+            console.log(err);
+        }
+        res.status(200).json({data: docs})
+    })
+}
